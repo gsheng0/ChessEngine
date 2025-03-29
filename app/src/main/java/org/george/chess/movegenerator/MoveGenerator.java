@@ -1,50 +1,76 @@
 package org.george.chess.movegenerator;
 
-import org.george.chess.model.Board;
-import java.util.List;
-import static org.george.chess.util.Consants.BLACK;
-import static org.george.chess.util.Consants.WHITE;
+import static org.george.chess.util.Constants.*;
+import org.george.chess.util.Logger;
 
 public class MoveGenerator {
+    private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
 
-    public static final long A_FILE = 0x8080808080808080L;
-    public static final long H_FILE = 0x0101010101010101L;
-    public static final int PAWN = 0;
-    public static final int KNIGHT = 1;
-    public static final int BISHOP = 2;
-    public static final int ROOK = 3;
-    public static final int QUEEN = 4;
-    public static final int KING = 5;
-    public static final int[] ROOK_SHIFTS = new int[] { 8, -8, 1, -1 };
-    public static final long[] PRUNING = new int[] { (long)(Math.pow(2, 63) >> 8, (long)(Math.pow(2, 63) << 8, H_FILE, A_HILE }; 
-    
-    long generateMoves(long[][] pieces, int side){
+    public long[][] generateMoves(final long[][] pieces, final int side) {
         long[] white = pieces[WHITE];
-        long[] black = pieces[BLALCK];
-        long W = white[PAWN] | white[KNIGHT] | white[BISHOP] | white[ROOK] | white[QUEEN] | white[KING];
-        long B = black[PAWN] | black[KNIGHT] | black[BISHOP] | black[ROOK] | black[QUEEN] | black[KING];
+        long[] black = pieces[BLACK];
+        long[] cum = new long[2];
+        for (int i = 0; i < pieces[WHITE].length; i++) {
+            cum[WHITE] |= pieces[WHITE][i];
+            cum[BLACK] |= pieces[BLACK][i];
+        }
+        long[][] moves = new long[2][KING + 1];
+        moves[side][PAWN] = generatePawnMoves(pieces, cum, side);
+        moves[side][KNIGHT] = generateKnightMoves(pieces, cum, side);
+        moves[side][BISHOP] = generateBishopMoves(pieces, cum, side);
+        moves[side][ROOK] = generateRookMoves(pieces, cum, side);
+        moves[side][QUEEN] = generateQueenMoves(pieces, cum, side);
+        moves[side][KING] = generateKingMoves(pieces, cum, side);
+        return moves;
     }
-    long generateRook(long[][] pieces, long[] cum, int side){
-        long out = 0;
-        for(int i = 0; i < ROOK_SHIFTS.length; i++){
+
+    public long generateRookMoves(final long[][] pieces, final long[] cum, final int side) {
+        logger.log(Long.toBinaryString(pieces[WHITE][ROOK]));
+        logger.logBitBoard("White rooks", pieces[WHITE][ROOK]);
+        logger.logBitBoard("White pieces", cum[WHITE]);
+        logger.logBitBoard("Black pieces", cum[BLACK]);
+        long out = 0l;
+        for (int i = 0; i < ROOK_SHIFTS.length; i++) {
             long rook = pieces[side][ROOK];
-            while(rook > 0){
-                rook &= PRUNING[i];
+            while (rook > 0) {
+                rook &= ROOK_SHIFT_PRUNING[i];
                 rook = rook << ROOK_SHIFTS[i];
-                long occupied = ~cum[1- side];
+                long occupied = ~cum[side];
                 rook &= occupied;
                 out |= rook;
-                long captured = rook & b;
+                long captured = rook & cum[1 - side];
                 rook ^= captured;
             }
         }
+        logger.logBitBoard("Rook moves", out);
 
-        
-        
-        
+        return out;
 
     }
 
+    long generatePawnMoves(final long[][] pieces, final long[] cum, final int side) {
+        long moves = 0l;
+        return moves;
+    }
 
-    
+    long generateKnightMoves(final long[][] pieces, final long[] cum, final int side) {
+        long moves = 0l;
+        return moves;
+    }
+
+    long generateBishopMoves(final long[][] pieces, final long[] cum, final int side) {
+        long moves = 0l;
+        return moves;
+    }
+
+    long generateQueenMoves(final long[][] pieces, final long[] cum, final int side) {
+        long moves = 0l;
+        return moves;
+    }
+
+    long generateKingMoves(final long[][] pieces, final long[] cum, final int side) {
+        long moves = 0l;
+        return moves;
+    }
+
 }
