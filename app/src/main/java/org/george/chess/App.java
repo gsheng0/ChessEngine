@@ -7,6 +7,7 @@ import org.george.chess.util.Window;
 
 public class App {
     public static void main(String[] args) {
+        final Window window = new Window();
         long[][] pieces = new long[2][KING + 1];
 
         pieces[WHITE][ROOK] = (long) (Math.pow(2, 8) - 1);

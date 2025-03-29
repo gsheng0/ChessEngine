@@ -30,7 +30,7 @@ public class Window extends JPanel implements KeyListener {
                 int x = SQUARE_SIZE * i;
                 int y = SQUARE_SIZE * j;
                 g.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
-                int num = i + j * 8;
+                int num = 63 - (i + j * 8);
                 g.setColor(Color.BLACK);
                 g.drawString("" + num, x, y + 90);
             }

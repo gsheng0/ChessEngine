@@ -14,17 +14,17 @@ public class Logger<T> {
         return new Logger<T>(clazz);
     }
 
-    public void log(String s) {
+    public void log(final String s) {
         System.out.print(prefix.toString());
         System.out.println(s);
     }
 
-    public void logln(String s) {
+    public void logln(final String s) {
         System.out.println(prefix.toString());
         System.out.println(s);
     }
 
-    public void logBitBoard(String title, long board) {
+    public void logBitBoard(final String title, final long board) {
         log(title);
         final StringBuilder builder = new StringBuilder();
         final StringBuilder binary = new StringBuilder(Long.toBinaryString(board));
