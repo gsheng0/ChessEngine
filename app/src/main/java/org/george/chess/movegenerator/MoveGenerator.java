@@ -7,39 +7,35 @@ public class MoveGenerator {
     private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
 
     public long[][] generateMoves(final long[][] pieces, final int side) {
-        long[] white = pieces[WHITE];
-        long[] black = pieces[BLACK];
-        long[] cum = new long[2];
+        long[] all = new long[2];
         for (int i = 0; i < pieces[WHITE].length; i++) {
-            cum[WHITE] |= pieces[WHITE][i];
-            cum[BLACK] |= pieces[BLACK][i];
+            all[WHITE] |= pieces[WHITE][i];
+            all[BLACK] |= pieces[BLACK][i];
         }
         long[][] moves = new long[2][KING + 1];
-        moves[side][PAWN] = generatePawnMoves(pieces, cum, side);
-        moves[side][KNIGHT] = generateKnightMoves(pieces, cum, side);
-        moves[side][BISHOP] = generateBishopMoves(pieces, cum, side);
-        moves[side][ROOK] = generateRookMoves(pieces, cum, side);
-        moves[side][QUEEN] = generateQueenMoves(pieces, cum, side);
-        moves[side][KING] = generateKingMoves(pieces, cum, side);
+        moves[side][PAWN] = generatePawnMoves(pieces, all, side);
+        moves[side][KNIGHT] = generateKnightMoves(pieces, all, side);
+        moves[side][BISHOP] = generateBishopMoves(pieces, all, side);
+        moves[side][ROOK] = generateRookMoves(pieces, all, side);
+        moves[side][QUEEN] = generateQueenMoves(pieces, all, side);
+        moves[side][KING] = generateKingMoves(pieces, all, side);
         return moves;
     }
 
-    public long generateRookMoves(final long[][] pieces, final long[] cum, final int side) {
+    public long generateRookMoves(final long[][] pieces, final long[] all, final int side) {
         logger.log(Long.toBinaryString(pieces[WHITE][ROOK]));
+        logger.logBitBoard("A FILE", A_FILE);
         logger.logBitBoard("White rooks", pieces[WHITE][ROOK]);
-        logger.logBitBoard("White pieces", cum[WHITE]);
-        logger.logBitBoard("Black pieces", cum[BLACK]);
+        logger.logBitBoard("White pieces", all[WHITE]);
+        logger.logBitBoard("Black pieces", all[BLACK]);
+        logger.logBitBoard("PRUNING ONE", ROOK_SHIFT_PRUNING[0]);
         long out = 0l;
         for (int i = 0; i < ROOK_SHIFTS.length; i++) {
             long rook = pieces[side][ROOK];
-            while (rook > 0) {
-                rook &= ROOK_SHIFT_PRUNING[i];
-                rook = rook << ROOK_SHIFTS[i];
-                long occupied = ~cum[side];
-                rook &= occupied;
+            while (rook != 0) {
+                rook = ((rook & ROOK_SHIFT_PRUNING[i]) << ROOK_SHIFTS[i]) & ~all[side];
                 out |= rook;
-                long captured = rook & cum[1 - side];
-                rook ^= captured;
+                rook ^= rook & all[1 - side];
             }
         }
         logger.logBitBoard("Rook moves", out);
@@ -48,27 +44,27 @@ public class MoveGenerator {
 
     }
 
-    long generatePawnMoves(final long[][] pieces, final long[] cum, final int side) {
+    long generatePawnMoves(final long[][] pieces, final long[] all, final int side) {
         long moves = 0l;
         return moves;
     }
 
-    long generateKnightMoves(final long[][] pieces, final long[] cum, final int side) {
+    long generateKnightMoves(final long[][] pieces, final long[] all, final int side) {
         long moves = 0l;
         return moves;
     }
 
-    long generateBishopMoves(final long[][] pieces, final long[] cum, final int side) {
+    long generateBishopMoves(final long[][] pieces, final long[] all, final int side) {
         long moves = 0l;
         return moves;
     }
 
-    long generateQueenMoves(final long[][] pieces, final long[] cum, final int side) {
+    long generateQueenMoves(final long[][] pieces, final long[] all, final int side) {
         long moves = 0l;
         return moves;
     }
 
-    long generateKingMoves(final long[][] pieces, final long[] cum, final int side) {
+    long generateKingMoves(final long[][] pieces, final long[] all, final int side) {
         long moves = 0l;
         return moves;
     }

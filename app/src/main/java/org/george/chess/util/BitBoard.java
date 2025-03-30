@@ -12,6 +12,10 @@ public class BitBoard {
         return board;
     }
 
+    public static long consecutiveOnes(int len) {
+        return (long) (Math.pow(2, len) - 1);
+    }
+
     public static class BoardBuilder {
         private long[][] pieces;
 
@@ -25,7 +29,7 @@ public class BitBoard {
         }
 
         public BoardBuilder withAdditionally(int side, int piece, long board) {
-            pieces[side][piece] = board;
+            pieces[side][piece] |= board;
             return this;
         }
 
@@ -37,6 +41,6 @@ public class BitBoard {
         public long[][] get() {
             return pieces;
         }
-
     }
+
 }

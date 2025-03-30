@@ -12,8 +12,8 @@ public class Constants {
 
     // Standard constants
     // Sides
-    public static final int BLACK = 0;
-    public static final int WHITE = 1;
+    public static final int WHITE = 0;
+    public static final int BLACK = 1;
 
     // Pieces
     public static final int PAWN = 0;
@@ -26,8 +26,8 @@ public class Constants {
     // Board rows
     public static final long A_FILE = 0x8080808080808080L;
     public static final long H_FILE = 0x0101010101010101L;
-    public static final long FIRST_RANK = (long) (Math.pow(2, 63)) << 8;
-    public static final long EIGHTH_RANK = (long) (Math.pow(2, 63)) >> 8;
+    public static final long FIRST_RANK = ~((long) (Math.pow(2, 63)) << 8);
+    public static final long EIGHTH_RANK = ~((long) (Math.pow(2, 63)) >>> 8);
 
     // Move generation arrays
     // pawns
@@ -37,13 +37,17 @@ public class Constants {
 
     // bishops
     public static final int[] BISHOP_SHIFTS = new int[] { 9, -9, 7 - 7 };
+    public static final long[] BISHOP_SHIFT_PRUNING = new long[] {
+
+    };
 
     // rooks
     public static final int[] ROOK_SHIFTS = new int[] { 8, -8, 1, -1 };
     public static final long[] ROOK_SHIFT_PRUNING = new long[] {
-            EIGHTH_RANK,
-            FIRST_RANK,
-            H_FILE,
-            A_FILE
+            ~EIGHTH_RANK,
+            ~FIRST_RANK,
+            ~H_FILE,
+            ~A_FILE
     };
+
 }
