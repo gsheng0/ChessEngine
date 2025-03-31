@@ -1,10 +1,14 @@
 package org.george.chess.movegenerator;
 
 import static org.george.chess.util.Constants.*;
+
 import org.george.chess.util.Logger;
 
 public class MoveGenerator {
-    private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
+
+    private static final Logger<MoveGenerator> logger = Logger.of(
+        MoveGenerator.class
+    );
 
     public long[][] generateMoves(final long[][] pieces, final int side) {
         long[] all = new long[2];
@@ -22,18 +26,24 @@ public class MoveGenerator {
         return moves;
     }
 
-    public long generateRookMoves(final long[][] pieces, final long[] all, final int side) {
+    public long generateRookMoves(
+        final long[][] pieces,
+        final long[] all,
+        final int side
+    ) {
         logger.log(Long.toBinaryString(pieces[WHITE][ROOK]));
-        logger.logBitBoard("A FILE", A_FILE);
         logger.logBitBoard("White rooks", pieces[WHITE][ROOK]);
         logger.logBitBoard("White pieces", all[WHITE]);
         logger.logBitBoard("Black pieces", all[BLACK]);
-        logger.logBitBoard("PRUNING ONE", ROOK_SHIFT_PRUNING[0]);
         long out = 0l;
         for (int i = 0; i < ROOK_SHIFTS.length; i++) {
             long rook = pieces[side][ROOK];
             while (rook != 0) {
-                rook = ((rook & ROOK_SHIFT_PRUNING[i]) << ROOK_SHIFTS[i]) & ~all[side];
+                rook = rook & ROOK_SHIFT_PRUNING[i];
+                rook = ROOK_SHIFTS[i] < 0
+                    ? rook >>> (-1 * ROOK_SHIFTS[i])
+                    : rook << ROOK_SHIFTS[i];
+                rook &= ~all[side];
                 out |= rook;
                 rook ^= rook & all[1 - side];
             }
@@ -41,32 +51,50 @@ public class MoveGenerator {
         logger.logBitBoard("Rook moves", out);
 
         return out;
-
     }
 
-    long generatePawnMoves(final long[][] pieces, final long[] all, final int side) {
+    long generatePawnMoves(
+        final long[][] pieces,
+        final long[] all,
+        final int side
+    ) {
         long moves = 0l;
         return moves;
     }
 
-    long generateKnightMoves(final long[][] pieces, final long[] all, final int side) {
+    long generateKnightMoves(
+        final long[][] pieces,
+        final long[] all,
+        final int side
+    ) {
         long moves = 0l;
         return moves;
     }
 
-    long generateBishopMoves(final long[][] pieces, final long[] all, final int side) {
+    long generateBishopMoves(
+        final long[][] pieces,
+        final long[] all,
+        final int side
+    ) {
         long moves = 0l;
         return moves;
     }
 
-    long generateQueenMoves(final long[][] pieces, final long[] all, final int side) {
+    long generateQueenMoves(
+        final long[][] pieces,
+        final long[] all,
+        final int side
+    ) {
         long moves = 0l;
         return moves;
     }
 
-    long generateKingMoves(final long[][] pieces, final long[] all, final int side) {
+    long generateKingMoves(
+        final long[][] pieces,
+        final long[] all,
+        final int side
+    ) {
         long moves = 0l;
         return moves;
     }
-
 }
