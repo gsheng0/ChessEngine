@@ -14,38 +14,33 @@ public class App {
     public static void main(String[] args) {
         final Window window = new Window();
         long[][] pieces = new long[2][KING + 1];
-        long[] masks = Generator.generateRookAttackMasks();
-        // for (int i = 0; i < ROOK_SHIFT_PRUNING.length; i++) {
-        //     logger.logBitBoard("" + i, ROOK_SHIFT_PRUNING[i]);
-        // }
+        long[] masks = Generator.generateAttackMasks(QUEEN);
         for (int i = 0; i < 64; i++) {
             logger.logBitBoard("" + i, masks[i]);
         }
         pieces[WHITE][ROOK] = (long) (Math.pow(2, 8) - 1);
 
         pieces[BLACK][PAWN] = Long.parseLong(
-            "00000000" +
-            "00000000" +
-            "00000000" +
-            "00000010" +
-            "00001000" +
-            "00100000" +
-            "10000000" +
-            "00000000",
-            2
-        );
+                "00000000" +
+                        "00000000" +
+                        "00000000" +
+                        "00000010" +
+                        "00001000" +
+                        "00100000" +
+                        "10000000" +
+                        "00000000",
+                2);
 
         pieces[WHITE][PAWN] = Long.parseLong(
-            "00000000" +
-            "00000000" +
-            "00000001" +
-            "00000100" +
-            "00010000" +
-            "01000000" +
-            "00000000" +
-            "00000000",
-            2
-        );
+                "00000000" +
+                        "00000000" +
+                        "00000001" +
+                        "00000100" +
+                        "00010000" +
+                        "01000000" +
+                        "00000000" +
+                        "00000000",
+                2);
 
         MoveGenerator generator = new MoveGenerator();
         generator.generateMoves(pieces, WHITE);

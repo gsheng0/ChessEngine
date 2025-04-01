@@ -7,8 +7,7 @@ import org.george.chess.util.Logger;
 public class MoveGenerator {
 
     private static final Logger<MoveGenerator> logger = Logger.of(
-        MoveGenerator.class
-    );
+            MoveGenerator.class);
 
     public long[][] generateMoves(final long[][] pieces, final int side) {
         long[] all = new long[2];
@@ -26,75 +25,85 @@ public class MoveGenerator {
         return moves;
     }
 
-    public long generateRookMoves(
-        final long[][] pieces,
-        final long[] all,
-        final int side
-    ) {
-        logger.log(Long.toBinaryString(pieces[WHITE][ROOK]));
-        logger.logBitBoard("White rooks", pieces[WHITE][ROOK]);
-        logger.logBitBoard("White pieces", all[WHITE]);
-        logger.logBitBoard("Black pieces", all[BLACK]);
+    private long generateSlidingPieceMoves(
+            final long[][] pieces,
+            final long[] all,
+            final int side,
+            final int piece) {
         long out = 0l;
-        for (int i = 0; i < ROOK_SHIFTS.length; i++) {
-            long rook = pieces[side][ROOK];
-            while (rook != 0) {
-                rook = rook & ROOK_SHIFT_PRUNING[i];
-                rook = ROOK_SHIFTS[i] < 0
-                    ? rook >>> (-1 * ROOK_SHIFTS[i])
-                    : rook << ROOK_SHIFTS[i];
-                rook &= ~all[side];
-                out |= rook;
-                rook ^= rook & all[1 - side];
+        for (int i = 0; i < SHIFTS[piece].length; i++) {
+            long tracker = pieces[side][piece];
+            int shift = SHIFTS[piece][i];
+            while (tracker != 0) {
+                tracker &= PRUNES[piece][i];
+                tracker = shift < 0
+                        ? tracker >>> (-shift)
+                        : tracker << shift;
+                tracker &= ~all[side];
+                out |= tracker;
+                tracker ^= tracker & all[1 - side];
             }
         }
-        logger.logBitBoard("Rook moves", out);
+        return out;
+    }
 
+    private long generateNonSlidingPieceMoves(
+            final long[][] pieces,
+            final long[] all,
+            final int side,
+            final int piece) {
+        long out = 0l;
+        for (int i = 0; i < SHIFTS[piece].length; i++) {
+            int shift = SHIFTS[piece][i];
+            long pruned = (pieces[side][piece] & PRUNES[piece][i]) & (~all[side]);
+            pruned = shift < 0
+                    ? pruned >>> (-shift)
+                    : pruned << shift;
+            out |= pruned;
+        }
         return out;
     }
 
     long generatePawnMoves(
-        final long[][] pieces,
-        final long[] all,
-        final int side
-    ) {
+            final long[][] pieces,
+            final long[] all,
+            final int side) {
         long moves = 0l;
         return moves;
     }
 
     long generateKnightMoves(
-        final long[][] pieces,
-        final long[] all,
-        final int side
-    ) {
-        long moves = 0l;
-        return moves;
+            final long[][] pieces,
+            final long[] all,
+            final int side) {
+        return generateNonSlidingPieceMoves(pieces, all, side, KNIGHT);
     }
 
     long generateBishopMoves(
-        final long[][] pieces,
-        final long[] all,
-        final int side
-    ) {
-        long moves = 0l;
-        return moves;
+            final long[][] pieces,
+            final long[] all,
+            final int side) {
+        return generateSlidingPieceMoves(pieces, all, side, BISHOP);
+    }
+
+    long generateRookMoves(
+            final long[][] pieces,
+            final long[] all,
+            final int side) {
+        return generateSlidingPieceMoves(pieces, all, side, ROOK);
     }
 
     long generateQueenMoves(
-        final long[][] pieces,
-        final long[] all,
-        final int side
-    ) {
-        long moves = 0l;
-        return moves;
+            final long[][] pieces,
+            final long[] all,
+            final int side) {
+        return generateSlidingPieceMoves(pieces, all, side, QUEEN);
     }
 
     long generateKingMoves(
-        final long[][] pieces,
-        final long[] all,
-        final int side
-    ) {
-        long moves = 0l;
-        return moves;
+            final long[][] pieces,
+            final long[] all,
+            final int side) {
+        return generateNonSlidingPieceMoves(pieces, all, side, KING);
     }
 }
