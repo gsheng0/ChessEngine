@@ -15,7 +15,7 @@ public class App {
 
         public static void main(String[] args) {
                 final ContentHandler<long[]> contentHandler = new BitMaskContentHandler();
-                for (int i = KNIGHT; i <= KING; i++) {
+                for (int i = PAWN; i <= KING; i++) {
                         contentHandler.acceptContent(Generator.generateAttackMasks(i), PIECE_NAMES[i]);
                 }
                 final Window window = new Window(contentHandler);

@@ -36,6 +36,18 @@ public class Constants {
     public static final long EIGHTH_RANK = ~((long) (Math.pow(2, 63)) >>> 7);
 
     // Move generation arrays
+    // Pawns
+    public static final int[] PAWN_SHIFTS = { 8, -8 };
+    public static final long[] STARTING_RANK = { FIRST_RANK << 8, EIGHTH_RANK >>> 8 };
+    public static final int[][] PAWN_ATTACKS = {
+        { 7, 9 },
+        { -9, -7 },
+    };
+    public static final long[][] PAWN_ATTACK_PRUNES = {
+        { ~EIGHTH_RANK & ~H_FILE, ~EIGHTH_RANK & ~A_FILE },
+        { ~FIRST_RANK & ~H_FILE, ~FIRST_RANK & ~A_FILE },
+    };
+
     // Knights
     public static final int[] KNIGHT_SHIFTS = { 17, 15, 10, 6, -6, -10, -15, -17 };
     public static final long[] KNIGHT_PRUNES = {

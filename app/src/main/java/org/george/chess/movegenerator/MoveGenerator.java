@@ -62,6 +62,23 @@ public class MoveGenerator {
 
     long generatePawnMoves(final long[][] pieces, final long[] all, final int side) {
         long moves = 0L;
+        long pawns = pieces[side][PAWN];
+        long allPieces = all[WHITE] | all[BLACK];
+        //Captures
+        for(int i = 0; i < PAWN_ATTACKS[side].length; i++){
+            long pruned = pawns & PAWN_ATTACK_PRUNES[side][i];
+            moves |= (side == WHITE ? pruned << PAWN_ATTACKS[WHITE][i] : pruned >>> PAWN_ATTACKS[BLACK][i]) & all[1 - side];
+        }
+
+        //Normal Moves
+        long unmovedPawns = pawns & STARTING_RANK[side];
+        pawns ^= unmovedPawns;
+        unmovedPawns = (side == WHITE ? unmovedPawns << 8 : unmovedPawns >>> 8) & ~allPieces;
+        moves |= unmovedPawns;
+        pawns |= unmovedPawns;
+        pawns = (side == WHITE ? pawns << 8 : pawns >>> 8) & ~allPieces;
+        moves |= pawns;
+
         return moves;
     }
 
