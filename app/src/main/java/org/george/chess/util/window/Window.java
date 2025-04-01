@@ -1,4 +1,4 @@
-package org.george.chess.util;
+package org.george.chess.util.window;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -11,9 +11,10 @@ import java.awt.event.MouseListener;
 
 import static org.george.chess.util.Constants.*;
 
-public class Window extends JPanel implements KeyListener, MouseListener {
+public class Window<T> extends JPanel implements KeyListener, MouseListener {
     private JFrame frame;
     private Set<Integer> highlightedTiles;
+    private ContentHandler<T> contentHandler;
 
     public Window() {
         this.frame = new JFrame();
@@ -22,10 +23,17 @@ public class Window extends JPanel implements KeyListener, MouseListener {
         frame.setSize(SQUARE_SIZE * 10, SQUARE_SIZE * 10);
         frame.setVisible(true);
         frame.addMouseListener(this);
+        frame.addKeyListener(this);
+    }
+
+    public Window(ContentHandler<T> contentHandler) {
+        this();
+        this.contentHandler = contentHandler;
     }
 
     @Override
     public void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, SQUARE_SIZE * 10, SQUARE_SIZE * 10);
         g.setFont(LABEL_FONT);
@@ -35,13 +43,18 @@ public class Window extends JPanel implements KeyListener, MouseListener {
                 int x = SQUARE_SIZE * i;
                 int y = SQUARE_SIZE * j;
                 int num = 63 - (i + j * 8);
-                if (highlightedTiles.contains(num)) {
-                    g.setColor(Color.RED);
-                }
                 g.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
                 g.setColor(Color.BLACK);
                 g.drawString("" + num, x, y + 90);
+                if (highlightedTiles.contains(num)) {
+                    g2d.setStroke(new BasicStroke(5.0f));
+                    g2d.setColor(Color.BLUE);
+                    g2d.drawOval(x + 5, y + 5, SQUARE_SIZE - 10, SQUARE_SIZE - 10);
+                }
             }
+        }
+        if (contentHandler != null) {
+            contentHandler.draw(g);
         }
     }
 
@@ -55,6 +68,9 @@ public class Window extends JPanel implements KeyListener, MouseListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        System.out.println("Key Pressed: " + e.getKeyChar());
+        contentHandler.handleKeyPressed(e);
+        repaint();
     }
 
     @Override

@@ -6,8 +6,7 @@ import org.george.chess.util.Logger;
 
 public class MoveGenerator {
 
-    private static final Logger<MoveGenerator> logger = Logger.of(
-            MoveGenerator.class);
+    private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
 
     public long[][] generateMoves(final long[][] pieces, final int side) {
         long[] all = new long[2];
@@ -30,15 +29,13 @@ public class MoveGenerator {
             final long[] all,
             final int side,
             final int piece) {
-        long out = 0l;
+        long out = 0L;
         for (int i = 0; i < SHIFTS[piece].length; i++) {
             long tracker = pieces[side][piece];
             int shift = SHIFTS[piece][i];
             while (tracker != 0) {
                 tracker &= PRUNES[piece][i];
-                tracker = shift < 0
-                        ? tracker >>> (-shift)
-                        : tracker << shift;
+                tracker = shift < 0 ? tracker >>> (-shift) : tracker << shift;
                 tracker &= ~all[side];
                 out |= tracker;
                 tracker ^= tracker & all[1 - side];
@@ -52,58 +49,39 @@ public class MoveGenerator {
             final long[] all,
             final int side,
             final int piece) {
-        long out = 0l;
+        long out = 0L;
         for (int i = 0; i < SHIFTS[piece].length; i++) {
             int shift = SHIFTS[piece][i];
-            long pruned = (pieces[side][piece] & PRUNES[piece][i]) & (~all[side]);
-            pruned = shift < 0
-                    ? pruned >>> (-shift)
-                    : pruned << shift;
+            long pruned = (pieces[side][piece] & PRUNES[piece][i]);
+            pruned = shift < 0 ? pruned >>> (-shift) : pruned << shift;
+            pruned &= ~all[side];
             out |= pruned;
         }
         return out;
     }
 
-    long generatePawnMoves(
-            final long[][] pieces,
-            final long[] all,
-            final int side) {
-        long moves = 0l;
+    long generatePawnMoves(final long[][] pieces, final long[] all, final int side) {
+        long moves = 0L;
         return moves;
     }
 
-    long generateKnightMoves(
-            final long[][] pieces,
-            final long[] all,
-            final int side) {
+    long generateKnightMoves(final long[][] pieces, final long[] all, final int side) {
         return generateNonSlidingPieceMoves(pieces, all, side, KNIGHT);
     }
 
-    long generateBishopMoves(
-            final long[][] pieces,
-            final long[] all,
-            final int side) {
+    long generateBishopMoves(final long[][] pieces, final long[] all, final int side) {
         return generateSlidingPieceMoves(pieces, all, side, BISHOP);
     }
 
-    long generateRookMoves(
-            final long[][] pieces,
-            final long[] all,
-            final int side) {
+    long generateRookMoves(final long[][] pieces, final long[] all, final int side) {
         return generateSlidingPieceMoves(pieces, all, side, ROOK);
     }
 
-    long generateQueenMoves(
-            final long[][] pieces,
-            final long[] all,
-            final int side) {
+    long generateQueenMoves(final long[][] pieces, final long[] all, final int side) {
         return generateSlidingPieceMoves(pieces, all, side, QUEEN);
     }
 
-    long generateKingMoves(
-            final long[][] pieces,
-            final long[] all,
-            final int side) {
+    long generateKingMoves(final long[][] pieces, final long[] all, final int side) {
         return generateNonSlidingPieceMoves(pieces, all, side, KING);
     }
 }
