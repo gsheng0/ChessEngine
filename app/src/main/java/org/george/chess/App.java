@@ -14,6 +14,9 @@ public class App {
         private static final Logger<App> logger = Logger.of(App.class);
 
         public static void main(String[] args) {
+                for(int i = 1; i <= 20; i++){
+                        System.out.println(Integer.toBinaryString(i) + " " + Integer.toBinaryString(i & -i));
+                }
                 final ContentHandler<long[]> contentHandler = new BitMaskContentHandler();
                 for (int i = PAWN; i <= KING; i++) {
                         contentHandler.acceptContent(Generator.generateAttackMasks(i), PIECE_NAMES[i]);

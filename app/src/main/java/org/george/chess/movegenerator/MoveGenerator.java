@@ -11,23 +11,23 @@ public class MoveGenerator {
 
     private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
 
-    public List<Move> generateMoves(final long[][] pieces, final int side) {
-        List<Move> moves = new ArrayList<>();
+    public long[][] generateMoves(final long[][] pieces, final int side) {
+        long[][] moves = new long[2][KING + 1];
         long[] all = new long[2];
         for (int i = 0; i < pieces[WHITE].length; i++) {
             all[WHITE] |= pieces[WHITE][i];
             all[BLACK] |= pieces[BLACK][i];
         }
-        moves.addAll(generatePawnMoves(pieces, all, side));
+        moves[side][PAWN] = generatePawnMoves(pieces, all, side);
         moves[side][KNIGHT] = generateKnightMoves(pieces, all, side);
         moves[side][BISHOP] = generateBishopMoves(pieces, all, side);
         moves[side][ROOK] = generateRookMoves(pieces, all, side);
         moves[side][QUEEN] = generateQueenMoves(pieces, all, side);
         moves[side][KING] = generateKingMoves(pieces, all, side);
-        
+        return moves;
     }
 
-    private List<Move> generateSlidingPieceMoves(
+    private long generateSlidingPieceMoves(
             final long[][] pieces,
             final long[] all,
             final int side,
@@ -63,7 +63,7 @@ public class MoveGenerator {
         return out;
     }
 
-    long generatePawnMoves(final long[][] pieces, final long[] all, final int side) {
+    private long generatePawnMoves(final long[][] pieces, final long[] all, final int side) {
         long moves = 0L;
         long pawns = pieces[side][PAWN];
         long allPieces = all[WHITE] | all[BLACK];
