@@ -3,28 +3,31 @@ package org.george.chess.movegenerator;
 import static org.george.chess.util.Constants.*;
 
 import org.george.chess.util.Logger;
+import org.george.chess.model.Move;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MoveGenerator {
 
     private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
 
-    public long[][] generateMoves(final long[][] pieces, final int side) {
+    public List<Move> generateMoves(final long[][] pieces, final int side) {
+        List<Move> moves = new ArrayList<>();
         long[] all = new long[2];
         for (int i = 0; i < pieces[WHITE].length; i++) {
             all[WHITE] |= pieces[WHITE][i];
             all[BLACK] |= pieces[BLACK][i];
         }
-        long[][] moves = new long[2][KING + 1];
-        moves[side][PAWN] = generatePawnMoves(pieces, all, side);
+        moves.addAll(generatePawnMoves(pieces, all, side));
         moves[side][KNIGHT] = generateKnightMoves(pieces, all, side);
         moves[side][BISHOP] = generateBishopMoves(pieces, all, side);
         moves[side][ROOK] = generateRookMoves(pieces, all, side);
         moves[side][QUEEN] = generateQueenMoves(pieces, all, side);
         moves[side][KING] = generateKingMoves(pieces, all, side);
-        return moves;
+        
     }
 
-    private long generateSlidingPieceMoves(
+    private List<Move> generateSlidingPieceMoves(
             final long[][] pieces,
             final long[] all,
             final int side,

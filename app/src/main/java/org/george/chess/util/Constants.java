@@ -35,6 +35,8 @@ public class Constants {
     public static final long FIRST_RANK = ~((long) (Math.pow(2, 63)) << 8);
     public static final long EIGHTH_RANK = ~((long) (Math.pow(2, 63)) >>> 7);
 
+    public static final long EDGES = A_FILE | H_FILE | FIRST_RANK | EIGHTH_RANK;
+
     // Move generation arrays
     // Pawns
     public static final int[] PAWN_SHIFTS = { 8, -8 };
