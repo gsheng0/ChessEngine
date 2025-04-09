@@ -4,12 +4,19 @@ import static org.george.chess.util.Constants.*;
 
 import org.george.chess.util.Logger;
 import org.george.chess.model.Move;
+import org.george.chess.model.Position;
 import java.util.List;
 import java.util.ArrayList;
 
 public class MoveGenerator {
 
     private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
+
+    public Move[] generateMoves(Position position){
+        Move[] moves = new Move[218];
+
+        return moves;
+    }
 
     public long[][] generateMoves(final long[][] pieces, final int side) {
         long[][] moves = new long[2][KING + 1];

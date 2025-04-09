@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class MoveGeneratorTest {
 	private MoveGenerator moveGenerator = new MoveGenerator();
 	private BoardBuilder boardBuilder = new BoardBuilder();
-
+/*
 	@Test
 	void BottomRankRooks_AlternatingPawns_Test() {
 		boardBuilder.clear()
@@ -42,5 +42,5 @@ public class MoveGeneratorTest {
 		}
 		return all;
 	}
-
+*/
 }

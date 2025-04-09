@@ -2,6 +2,9 @@ package org.george.chess.util;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
+import javax.imageio.ImageIO;
+import java.io.File;
 
 public class Constants {
 
@@ -12,6 +15,7 @@ public class Constants {
     public static final Font LABEL_FONT = new Font("Times New Roman", Font.PLAIN, 60);
     public static final int HORIZONTAL_SHIFT = 1;
     public static final int VERTICAL_SHIFT = 29;
+
 
     // Standard constants
     // Sides
@@ -124,5 +128,36 @@ public class Constants {
         QUEEN_PRUNES,
         KING_PRUNES
     };
+
+    //Piece Images
+    public static Image[][] PIECE_IMAGES = new Image[2][KING + 1];
+
+    static {
+        final String IMAGE_PATH_PREFIX = "C:\\Users\\George\\proj\\chess\\app\\src\\main\\resources\\";
+        PIECE_IMAGES[WHITE][PAWN] = getImage(IMAGE_PATH_PREFIX + "white_pawn.png");
+        PIECE_IMAGES[WHITE][KNIGHT] = getImage(IMAGE_PATH_PREFIX + "white_knight.png");
+        PIECE_IMAGES[WHITE][BISHOP] = getImage(IMAGE_PATH_PREFIX + "white_bishop.png");
+        PIECE_IMAGES[WHITE][ROOK] = getImage(IMAGE_PATH_PREFIX + "white_rook.png");
+        PIECE_IMAGES[WHITE][QUEEN] = getImage(IMAGE_PATH_PREFIX + "white_queen.png");
+        PIECE_IMAGES[WHITE][KING] = getImage(IMAGE_PATH_PREFIX + "white_king.png");
+
+        PIECE_IMAGES[BLACK][PAWN] = getImage(IMAGE_PATH_PREFIX + "black_pawn.png");
+        PIECE_IMAGES[BLACK][KNIGHT] = getImage(IMAGE_PATH_PREFIX + "black_knight.png");
+        PIECE_IMAGES[BLACK][BISHOP] = getImage(IMAGE_PATH_PREFIX + "black_bishop.png");
+        PIECE_IMAGES[BLACK][ROOK] = getImage(IMAGE_PATH_PREFIX + "black_rook.png");
+        PIECE_IMAGES[BLACK][QUEEN] = getImage(IMAGE_PATH_PREFIX + "black_queen.png");
+        PIECE_IMAGES[BLACK][KING] = getImage(IMAGE_PATH_PREFIX + "black_king.png");
+        System.out.println("Done loading piece images");
+    }
+
+    private static Image getImage(String path){
+        File file = new File(path);
+        try{
+            return ImageIO.read(file);
+        } catch(Exception e){
+            throw new RuntimeException("Error retrieving image with path: " + path);
+        } 
+
+    }
 }
 

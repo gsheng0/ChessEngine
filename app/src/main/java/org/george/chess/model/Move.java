@@ -1,16 +1,20 @@
 package org.george.chess.model;
 
 /**
+17 
 Promotion     
+|     10            3
 |     From tile     Piece
 000 0 000000 000000 000 0
     |        To tile    Side
+    |        4          0
     En Passant
-3   1 6      6      3   1
-
+    16
  */
 
 import static org.george.chess.util.Constants.*;
+
+import org.george.chess.util.BitBoard;
 
 public class Move {
         private static final long PIECE_SHIFT = 1l;
@@ -74,5 +78,59 @@ public class Move {
 
         public static Move KING_SIDE_CASTLE(int side){
                 return Move.of((KING_SIDE_CASTLE << 1) | side);
+        }
+
+        public static Move parseUCIString(Position position, String move){
+                System.out.println("Parsing move: " + move);
+                char[] from = move.substring(0, 2).toCharArray();
+                char[] to = move.substring(2).toCharArray();
+                System.out.println(new String(from));
+                System.out.println(new String(to));
+                int fromTile = BitBoard.namedTileToIndex(from);
+                int toTile = BitBoard.namedTileToIndex(to);
+                long[][] pieces = position.getPieces();
+                long out = 0l;
+
+                //Check for Castles
+                if(to[1] == from[1] && to[1] == '8' && (pieces[BLACK][KING] & (1l << fromTile)) != 0 && Math.abs(from[0] - from[1]) > 1){ 
+                        if(from[0] == 'e' && to[0] == 'g'){
+                                return Move.KING_SIDE_CASTLE(BLACK);
+                        } else{
+                                return Move.QUEEN_SIDE_CASTLE(BLACK);
+                        }
+                } else if(to[1] == from[1] && to[1] == '1' && (pieces[WHITE][KING] & (1l << fromTile)) != 0 && Math.abs(from[0] - from[1]) > 1){ 
+                        if(from[0] == 'e' && to[0] == 'g'){
+                                return Move.KING_SIDE_CASTLE(BLACK);
+                        } else{
+                                return Move.QUEEN_SIDE_CASTLE(BLACK);
+                        }
+                }
+
+                if(to.length > 2){
+                        char p = to[2];
+                        if(p == 'q'){
+                                out |= QUEEN << PROMOTION_SHIFT;
+                        } else if(p == 'r'){
+                                out |= ROOK << PROMOTION_SHIFT;
+                        } else if(p == 'b'){
+                                out |= BISHOP << PROMOTION_SHIFT;
+                        } else if(p == 'n'){
+                                out |= KNIGHT << PROMOTION_SHIFT;
+                        }
+                }
+                long tileMask = 1l << fromTile;
+                for(long piece = PAWN; piece <= KING; piece++){
+                        for(int side = WHITE; side <= BLACK; side++){
+                                if((tileMask & pieces[side][(int)piece]) == 0){
+                                        continue;
+                                }
+                                out |= side | (piece << PIECE_SHIFT);
+                        }
+                }
+                
+                out |= toTile << TO_TILE_SHIFT;
+                out |= fromTile << FROM_TILE_SHIFT;
+
+                return Move.of(out);
         }
 }

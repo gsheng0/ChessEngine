@@ -31,6 +31,11 @@ public class Window<T> extends JPanel implements KeyListener, MouseListener {
         this.contentHandler = contentHandler;
     }
 
+    public void acceptContent(T content){
+        contentHandler.acceptContent(content);
+        repaint();
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -45,7 +50,7 @@ public class Window<T> extends JPanel implements KeyListener, MouseListener {
                 int num = 63 - (i + j * 8);
                 g.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
                 g.setColor(Color.BLACK);
-                g.drawString("" + num, x, y + 90);
+                //g.drawString("" + num, x, y + 90);
                 if (highlightedTiles.contains(num)) {
                     g2d.setStroke(new BasicStroke(5.0f));
                     g2d.setColor(Color.BLUE);

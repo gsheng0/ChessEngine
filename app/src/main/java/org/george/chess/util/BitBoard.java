@@ -1,6 +1,11 @@
 package org.george.chess.util;
 
 import static org.george.chess.util.Constants.*;
+import java.awt.*;
+import java.awt.image.ImageObserver;
+import java.util.Arrays;
+
+import org.george.chess.model.Position;
 
 import java.util.List;
 
@@ -37,6 +42,27 @@ public class BitBoard {
         return bitBoard;
     }
 
+    public static void drawBitBoard(final Graphics g, final Position position, final ImageObserver observer){
+        final long[][] pieces = position.getPieces();
+        for(int side = WHITE; side <= BLACK; side++){
+            for(int piece = PAWN; piece <= KING; piece++){
+                long occupancy = pieces[side][piece];
+                while(occupancy != 0){
+                    int tile = 63 - Long.numberOfLeadingZeros(occupancy & -occupancy);
+                    //System.out.println("Tile " + tile + " has a " + (side == WHITE ? "WHITE" : "BLACK") + " " + PIECE_NAMES[piece]);
+                    occupancy &= occupancy - 1;
+                    int x = 7 - tile % 8;
+                    int y = 7 - tile / 8;
+                    g.drawImage(PIECE_IMAGES[side][piece], x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE, observer);
+                }
+            }
+        }
+    }
+
+    public static int namedTileToIndex(char[] move){
+        return (move[1] - '1') * 8 + 7 - (move[0] - 'a');
+    }
+
     public static class BoardBuilder {
 
         private long[][] pieces;
@@ -61,7 +87,13 @@ public class BitBoard {
         }
 
         public long[][] get() {
-            return pieces;
+            final long[][] out = new long[2][KING + 1];
+            for(int i = 0; i < out.length; i++){
+                for(int j = 0; j < out[0].length; j++){
+                    out[i][j] = pieces[i][j];
+                }
+            }
+            return out;
         }
     }
 
