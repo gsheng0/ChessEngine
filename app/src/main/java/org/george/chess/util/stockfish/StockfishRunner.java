@@ -25,7 +25,7 @@ public class StockfishRunner {
     private OutputStreamWriter processWriter;
 
     private StockfishRunner() {
-        ProcessBuilder processBuilder = new ProcessBuilder(STOCKFISH_PATH);
+        ProcessBuilder processBuilder = new ProcessBuilder("stockfish");
         try{
             engineProcess = processBuilder.start();
             System.out.println("Successfully started stockfish");

@@ -62,6 +62,11 @@ public class BitBoard {
     public static int namedTileToIndex(char[] move){
         return (move[1] - '1') * 8 + 7 - (move[0] - 'a');
     }
+    public static char[] indexToNamedTile(int tile){
+        char l = (char)('a' + (7 - (tile%8)));
+        char n = (char)('1' + tile/8);
+        return new char[] { l, n };
+    }
 
     public static class BoardBuilder {
 

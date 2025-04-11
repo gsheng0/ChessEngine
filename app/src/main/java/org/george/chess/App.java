@@ -25,7 +25,6 @@ public class App {
                 final ChessGameContentHandler contentHandler = new ChessGameContentHandler();
                 final Window<Move> window = new Window<Move>(contentHandler);
                 StockfishRunner stockfish = StockfishRunner.get();
-                stockfish.setThreads(10);
                 List<String> moves = new ArrayList<>();
                 while(true){
                         String move = stockfish.getBestMove(moves);
@@ -33,7 +32,9 @@ public class App {
                                 break;
                         }
                         moves.add(move);
-                        window.acceptContent(Move.parseUCIString(contentHandler.getPosition(), move));
+                        Move parsedMove = Move.parseUCIString(contentHandler.getPosition(), move);
+                        System.out.println("Parsed move: " + parsedMove.toString());
+                        window.acceptContent(parsedMove);
                         System.out.println(move);
                 }
                 System.out.println("Game done: ");

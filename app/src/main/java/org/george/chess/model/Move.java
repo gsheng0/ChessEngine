@@ -40,6 +40,29 @@ public class Move {
                 this.move = move;
         }
 
+        public String toString(){
+                final StringBuilder builder = new StringBuilder();
+                if(side() == WHITE){
+                        builder.append("White");
+                } else{
+                        builder.append("Black");
+                }
+                builder.append(" ");
+
+                int piece = this.piece();
+                if(piece == KING_SIDE_CASTLE){
+                        return builder.append("castles King side").toString();
+                } else if(piece == QUEEN_SIDE_CASTLE){
+                        return builder.append("castles Queen side").toString();
+                }
+                builder.append("moves ");
+                builder.append(PIECE_NAMES[piece]);
+                builder.append(" from ");
+                builder.append(BitBoard.indexToNamedTile((int)from()));
+                builder.append(" to ");
+                builder.append(BitBoard.indexToNamedTile((int)to()));
+                return builder.toString();
+        }
         public static Move of(long move){
                 return new Move(move);
         }
@@ -100,9 +123,9 @@ public class Move {
                         }
                 } else if(to[1] == from[1] && to[1] == '1' && (pieces[WHITE][KING] & (1l << fromTile)) != 0 && Math.abs(from[0] - from[1]) > 1){ 
                         if(from[0] == 'e' && to[0] == 'g'){
-                                return Move.KING_SIDE_CASTLE(BLACK);
+                                return Move.KING_SIDE_CASTLE(WHITE);
                         } else{
-                                return Move.QUEEN_SIDE_CASTLE(BLACK);
+                                return Move.QUEEN_SIDE_CASTLE(WHITE);
                         }
                 }
 
