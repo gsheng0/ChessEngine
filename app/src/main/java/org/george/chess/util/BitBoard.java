@@ -10,6 +10,29 @@ import org.george.chess.model.Position;
 import java.util.List;
 
 public class BitBoard {
+    public static long[][] GET_START_POSITION(){
+        BitBoard.BoardBuilder builder = new BitBoard.BoardBuilder();
+        builder.withAdditionally(WHITE, PAWN, FIRST_RANK << 8);
+        builder.withAdditionally(WHITE, KING, 1l << 3);
+        builder.withAdditionally(WHITE, QUEEN, 1l << 4);
+        builder.withAdditionally(WHITE, KNIGHT, 1l << 1);
+        builder.withAdditionally(WHITE, KNIGHT, 1l << 6);
+        builder.withAdditionally(WHITE, BISHOP, 1l << 5);
+        builder.withAdditionally(WHITE, BISHOP, 1l << 2);
+        builder.withAdditionally(WHITE, ROOK, 1l << 7);
+        builder.withAdditionally(WHITE, ROOK, 1l);
+
+        builder.withAdditionally(BLACK, PAWN, EIGHTH_RANK >>> 8);
+        builder.withAdditionally(BLACK, KING, 1l << 59);
+        builder.withAdditionally(BLACK, QUEEN, 1l << 60);
+        builder.withAdditionally(BLACK, KNIGHT, 1l << 57);
+        builder.withAdditionally(BLACK, KNIGHT, 1l << 62);
+        builder.withAdditionally(BLACK, BISHOP, 1l << 61);
+        builder.withAdditionally(BLACK, BISHOP, 1l << 58);
+        builder.withAdditionally(BLACK, ROOK, 1l << 63);
+        builder.withAdditionally(BLACK, ROOK, 1l << 56);
+        return builder.get();
+    }
 
     public static long write(final List<Integer> indices) {
         long board = 0l;
@@ -49,7 +72,6 @@ public class BitBoard {
                 long occupancy = pieces[side][piece];
                 while(occupancy != 0){
                     int tile = 63 - Long.numberOfLeadingZeros(occupancy & -occupancy);
-                    //System.out.println("Tile " + tile + " has a " + (side == WHITE ? "WHITE" : "BLACK") + " " + PIECE_NAMES[piece]);
                     occupancy &= occupancy - 1;
                     int x = 7 - tile % 8;
                     int y = 7 - tile / 8;

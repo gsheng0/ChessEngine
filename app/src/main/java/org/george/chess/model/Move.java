@@ -33,11 +33,14 @@ public class Move {
         public static final long KING_SIDE_CASTLE = 6l;
         public static final long QUEEN_SIDE_CASTLE = 7l;
 
-
         public final long move;
 
         private Move(long move){
                 this.move = move;
+        }
+
+        public static Builder builder(){
+                return new Builder();
         }
 
         public String toString(){
@@ -107,8 +110,6 @@ public class Move {
                 System.out.println("Parsing move: " + move);
                 char[] from = move.substring(0, 2).toCharArray();
                 char[] to = move.substring(2).toCharArray();
-                System.out.println(new String(from));
-                System.out.println(new String(to));
                 int fromTile = BitBoard.namedTileToIndex(from);
                 int toTile = BitBoard.namedTileToIndex(to);
                 long[][] pieces = position.getPieces();
@@ -129,6 +130,7 @@ public class Move {
                         }
                 }
 
+                //Checking for pawn promotion
                 if(to.length > 2){
                         char p = to[2];
                         if(p == 'q'){
@@ -141,6 +143,8 @@ public class Move {
                                 out |= KNIGHT << PROMOTION_SHIFT;
                         }
                 }
+
+                //Finding which piece is being moved
                 long tileMask = 1l << fromTile;
                 for(long piece = PAWN; piece <= KING; piece++){
                         for(int side = WHITE; side <= BLACK; side++){
@@ -155,5 +159,72 @@ public class Move {
                 out |= fromTile << FROM_TILE_SHIFT;
 
                 return Move.of(out);
+        }
+
+        public static class Builder {
+                private int piece;
+                private int to;
+                private int from;
+                private int enPassant;
+                private int promotion;
+                private int side;
+                private Builder(){
+                        this.piece = 0;
+                        this.to = 0;
+                        this.from = 0;
+                        this.enPassant = 0;
+                        this.promotion = 0;
+                        this.side = 0;
+                }
+
+                public Builder clear(){
+                        this.piece = 0;
+                        this.to = 0;
+                        this.from = 0;
+                        this.enPassant = 0;
+                        this.promotion = 0;
+                        this.side = 0;
+                        return this;
+                }
+                
+                public Builder withPiece(final int piece){
+                        this.piece = piece;
+                        return this;
+                }
+
+                public Builder withFromTile(final int fromTile){
+                        this.from= fromTile;
+                        return this;
+                }
+
+                public Builder withToTile(final int toTile){
+                        this.to = toTile;
+                        return this;
+                }
+
+                public Builder withPromotionPiece(final int promotionPiece){
+                        this.promotion= promotionPiece;
+                        return this;
+                }
+
+                public Builder withEnPassant(final int enPassant){
+                        this.enPassant = enPassant;
+                        return this;
+                }
+                
+                public Builder withSide(final int side){
+                        this.side = side;
+                        return this;
+                } 
+
+                public Move build(){
+                        long move = side | 
+                                    piece << PIECE_SHIFT |
+                                    to << TO_TILE_SHIFT |
+                                    from << FROM_TILE_SHIFT |
+                                    promotion << PROMOTION_SHIFT |
+                                    enPassant << EN_PASSANT_SHIFT;
+                        return Move.of(move);
+                }
         }
 }

@@ -85,7 +85,7 @@ public class StockfishRunner {
         return readResponse();
     }
 
-    public void close() throws IOException {
+    public void close() {
         try{
             writeCommand("quit");
             processReader.close();

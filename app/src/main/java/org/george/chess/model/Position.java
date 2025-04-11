@@ -1,6 +1,9 @@
 package org.george.chess.model;
 
 import static org.george.chess.util.Constants.*;
+import java.util.Arrays;
+
+import org.george.chess.util.BitBoard;
 
 public class Position {
         private long[][] pieces;
@@ -16,12 +19,30 @@ public class Position {
                 this.castle = castle;
         }
 
+        public static Position START_POSITION = new Position(BitBoard.GET_START_POSITION(), 0, 0, new boolean[2][2]);
+
         public boolean canCastleKingSide(){
                 return castle[turn][KING_SIDE];
         }
 
         public boolean canCastleQueenSide(){
                 return castle[turn][QUEEN_SIDE];
+        }
+
+        public Position copy(){
+                long[][] piecesCopy = new long[2][KING + 1];
+                for(int s = WHITE; s <= BLACK; s++){
+                        for(int p = PAWN; p <= KING; p++){
+                                piecesCopy[s][p] = pieces[s][p];
+                        }
+                }
+                boolean[][] castleCopy = new boolean[2][2];
+                for(int i = 0; i < 2; i++){
+                        for(int j = 0; j < 2; j++){
+                                castleCopy[i][j] = castle[i][j];
+                        }
+                }
+                return new Position(piecesCopy, turn, enPassant, castleCopy);
         }
 
         //move this into an interace implementation to enable other variants of chess
