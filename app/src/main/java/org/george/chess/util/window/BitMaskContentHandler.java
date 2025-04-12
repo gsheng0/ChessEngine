@@ -26,19 +26,13 @@ public class BitMaskContentHandler implements ContentHandler<long[]> {
     }
 
     @Override
-    public void acceptContent(final long[] content) {
+    public boolean acceptContent(final long[] content) {
         masks.add(content);
-        labels.add("");
+        return false;
     }
 
     @Override
-    public void acceptContent(final long[] content, String label) {
-        masks.add(content);
-        labels.add(label);
-    }
-
-    @Override
-    public void handleKeyPressed(final KeyEvent e) {
+    public boolean handleKeyPressed(final KeyEvent e) {
         if (e.getKeyChar() == 'l' && ++subIndex >= masks.get(index).length) {
             subIndex = 0;
             index = Math.min(masks.size() - 1, index + 1);
@@ -50,7 +44,10 @@ public class BitMaskContentHandler implements ContentHandler<long[]> {
         } else if (e.getKeyChar() == 'H') {
             index = Math.max(0, index - 1);
             subIndex = 0;
+        } else {
+            return false;
         }
+        return true;
     }
 
     @Override

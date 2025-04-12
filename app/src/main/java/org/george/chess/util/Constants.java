@@ -16,7 +16,6 @@ public class Constants {
     public static final int HORIZONTAL_SHIFT = 1;
     public static final int VERTICAL_SHIFT = 29;
 
-
     // Standard constants
     // Sides
     public static final int WHITE = 0;
@@ -128,6 +127,9 @@ public class Constants {
         QUEEN_PRUNES,
         KING_PRUNES
     };
+
+    public static final int RANK = 1;
+    public static final int FILE = 0;
 
     //Piece Images
     public static Image[][] PIECE_IMAGES = new Image[2][KING + 1];

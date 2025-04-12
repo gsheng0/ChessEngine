@@ -2,6 +2,8 @@ package org.george.chess.util.window;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -11,10 +13,10 @@ import java.awt.event.MouseListener;
 
 import static org.george.chess.util.Constants.*;
 
-public class Window<T> extends JPanel implements KeyListener, MouseListener {
+public class Window extends JPanel implements KeyListener, MouseListener {
     private JFrame frame;
     private Set<Integer> highlightedTiles;
-    private ContentHandler<T> contentHandler;
+    private List<ContentHandler> contentHandlers;
 
     public Window() {
         this.frame = new JFrame();
@@ -24,16 +26,26 @@ public class Window<T> extends JPanel implements KeyListener, MouseListener {
         frame.setVisible(true);
         frame.addMouseListener(this);
         frame.addKeyListener(this);
+        contentHandlers = new ArrayList<>();
     }
 
-    public Window(ContentHandler<T> contentHandler) {
+    public Window(ContentHandler... contentHandlers) {
         this();
-        this.contentHandler = contentHandler;
+        for(ContentHandler contentHandler : contentHandlers){
+            this.contentHandlers.add(contentHandler);
+        }
     }
 
-    public void acceptContent(T content){
-        contentHandler.acceptContent(content);
-        repaint();
+    public void acceptContent(Object content, Class<? extends ContentHandler> clazz){
+        boolean refresh = false;
+        for(ContentHandler contentHandler : contentHandlers){
+            if(contentHandler.getClass().equals(clazz)){
+                refresh = refresh || contentHandler.acceptContent(content);
+            }
+        }
+        if(refresh){
+            repaint();
+        }
     }
 
     @Override
@@ -58,7 +70,7 @@ public class Window<T> extends JPanel implements KeyListener, MouseListener {
                 }
             }
         }
-        if (contentHandler != null) {
+        for(ContentHandler contentHandler : contentHandlers){
             contentHandler.draw(g);
         }
     }
@@ -73,9 +85,13 @@ public class Window<T> extends JPanel implements KeyListener, MouseListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println("Key Pressed: " + e.getKeyChar());
-        contentHandler.handleKeyPressed(e);
-        repaint();
+        boolean refresh = false;
+        for(ContentHandler contentHandler : contentHandlers){
+            refresh = refresh || contentHandler.handleKeyPressed(e);
+        }
+        if(refresh){
+            repaint();
+        }
     }
 
     @Override

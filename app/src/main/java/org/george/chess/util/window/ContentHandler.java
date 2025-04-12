@@ -4,11 +4,12 @@ import java.awt.event.KeyEvent;
 import java.awt.Graphics;
 
 public interface ContentHandler<T> {
-    public void acceptContent(T content);
 
-    public void acceptContent(T content, String label);
+    //Returns whether or not to repaint
+    public boolean acceptContent(T content);
 
-    public void handleKeyPressed(KeyEvent e);
+    //Returns whether or not to repaint
+    public boolean handleKeyPressed(KeyEvent e);
 
     public void draw(Graphics g);
 }

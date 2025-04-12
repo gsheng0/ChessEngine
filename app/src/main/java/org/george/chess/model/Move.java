@@ -107,7 +107,6 @@ public class Move {
         }
 
         public static Move parseUCIString(Position position, String move){
-                System.out.println("Parsing move: " + move);
                 char[] from = move.substring(0, 2).toCharArray();
                 char[] to = move.substring(2).toCharArray();
                 int fromTile = BitBoard.namedTileToIndex(from);
@@ -116,14 +115,14 @@ public class Move {
                 long out = 0l;
 
                 //Check for Castles
-                if(to[1] == from[1] && to[1] == '8' && (pieces[BLACK][KING] & (1l << fromTile)) != 0 && Math.abs(from[0] - from[1]) > 1){ 
-                        if(from[0] == 'e' && to[0] == 'g'){
+                if(to[RANK] == from[RANK] && to[RANK] == '8' && (pieces[BLACK][KING] & (1l << fromTile)) != 0 && Math.abs(to[FILE] - from[FILE]) > 1){ 
+                        if(from[FILE] == 'e' && to[FILE] == 'g'){
                                 return Move.KING_SIDE_CASTLE(BLACK);
                         } else{
                                 return Move.QUEEN_SIDE_CASTLE(BLACK);
                         }
-                } else if(to[1] == from[1] && to[1] == '1' && (pieces[WHITE][KING] & (1l << fromTile)) != 0 && Math.abs(from[0] - from[1]) > 1){ 
-                        if(from[0] == 'e' && to[0] == 'g'){
+                } else if(to[RANK] == from[RANK] && to[RANK] == '1' && (pieces[WHITE][KING] & (1l << fromTile)) != 0 && Math.abs(to[FILE] - from[FILE]) > 1){ 
+                        if(from[FILE] == 'e' && to[FILE] == 'g'){
                                 return Move.KING_SIDE_CASTLE(WHITE);
                         } else{
                                 return Move.QUEEN_SIDE_CASTLE(WHITE);
@@ -131,28 +130,38 @@ public class Move {
                 }
 
                 //Checking for pawn promotion
-                if(to.length > 2){
-                        char p = to[2];
-                        if(p == 'q'){
-                                out |= QUEEN << PROMOTION_SHIFT;
-                        } else if(p == 'r'){
-                                out |= ROOK << PROMOTION_SHIFT;
-                        } else if(p == 'b'){
-                                out |= BISHOP << PROMOTION_SHIFT;
-                        } else if(p == 'n'){
-                                out |= KNIGHT << PROMOTION_SHIFT;
-                        }
+                char promotion = to.length > 2 ? to[2] : '-';
+                if(promotion == 'q'){
+                        out |= QUEEN << PROMOTION_SHIFT;
+                } else if(promotion == 'r'){
+                        out |= ROOK << PROMOTION_SHIFT;
+                } else if(promotion == 'b'){
+                        out |= BISHOP << PROMOTION_SHIFT;
+                } else if(promotion == 'n'){
+                        out |= KNIGHT << PROMOTION_SHIFT;
                 }
 
                 //Finding which piece is being moved
                 long tileMask = 1l << fromTile;
-                for(long piece = PAWN; piece <= KING; piece++){
-                        for(int side = WHITE; side <= BLACK; side++){
-                                if((tileMask & pieces[side][(int)piece]) == 0){
+                int piece = -1;
+                int side = -1;
+                for(int p = PAWN; p <= KING; p++){
+                        for(int s = WHITE; s <= BLACK; s++){
+                                if((tileMask & pieces[s][p]) == 0){
                                         continue;
                                 }
-                                out |= side | (piece << PIECE_SHIFT);
+                                out |= s | (p << PIECE_SHIFT);
+                                piece = p;
+                                side = s;
+                                break;
                         }
+                }
+
+                //Checking for En Passant
+                if(piece == PAWN 
+                        && ((1l << toTile) & pieces[1 - side][PAWN]) == 0 //Is capture tile empty
+                        && from[FILE] != to[FILE]){      //Is pawn capture
+                        out |= 1l << EN_PASSANT_SHIFT;
                 }
                 
                 out |= toTile << TO_TILE_SHIFT;

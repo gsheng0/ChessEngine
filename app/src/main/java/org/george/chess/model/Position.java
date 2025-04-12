@@ -4,8 +4,11 @@ import static org.george.chess.util.Constants.*;
 import java.util.Arrays;
 
 import org.george.chess.util.BitBoard;
+import org.george.chess.util.Logger;
 
+//TODO: Find faster way to undo a move
 public class Position {
+        private static final Logger logger = Logger.of(Position.class);
         private long[][] pieces;
         private int turn;
         private int enPassant;
@@ -62,18 +65,19 @@ public class Position {
                 }
 
                 //normal move
-                long to = 1l << move.to();
-                pieces[move.side()][move.piece()] ^= 1l << move.from();
-                pieces[move.side()][move.piece()] ^= to;
+                long toTileMask = 1l << move.to();
+                pieces[move.side()][move.piece()] &= ~(1l << move.from());
+                pieces[move.side()][move.piece()] |= toTileMask;
 
                 //removing captured piece
                 for(int piece = PAWN; piece <= KING; piece++){
-                        pieces[1 - move.side()][piece] &= ~to;
+                        pieces[1 - move.side()][piece] &= ~toTileMask;
                 }
 
                 //removing en passant'd pawn
                 if(move.isEnPassant()){
-                        pieces[1 - move.side()][PAWN] ^= 1l << (move.from() + (move.side() == WHITE ? -8 : 8));
+                        logger.log("EN PASSANT");
+                        pieces[1 - move.side()][PAWN] &= ~(1l << (move.to() + (move.side() == WHITE ? -8 : 8)));
                 }
 
                 //setting possible en passant'able pawn square
@@ -84,8 +88,8 @@ public class Position {
                 
                 //pawn promotion
                 if(move.promotionPiece() > PAWN){
-                        pieces[move.side()][PAWN] &= ~(1l << move.to());
-                        pieces[move.side()][move.promotionPiece()] |= 1l << move.to();
+                        pieces[move.side()][PAWN] &= ~toTileMask;
+                        pieces[move.side()][move.promotionPiece()] |= toTileMask;
                 }
 
         }
