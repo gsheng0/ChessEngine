@@ -7,6 +7,7 @@ import org.george.chess.util.Constants;
 import org.george.chess.util.Logger;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.Graphics;
 
 import static org.george.chess.util.Constants.SQUARE_SIZE;
@@ -48,6 +49,11 @@ public class BitMaskContentHandler implements ContentHandler<long[]> {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean handleMousePressed(final MouseEvent e){
+        return false;
     }
 
     @Override

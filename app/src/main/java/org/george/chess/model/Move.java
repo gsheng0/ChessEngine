@@ -15,8 +15,10 @@ Promotion
 import static org.george.chess.util.Constants.*;
 
 import org.george.chess.util.BitBoard;
+import org.george.chess.util.Logger;
 
 public class Move {
+        private static final Logger logger = Logger.of(Move.class);
         private static final long PIECE_SHIFT = 1l;
         private static final long TO_TILE_SHIFT = 4l;
         private static final long FROM_TILE_SHIFT = 10l;
@@ -29,9 +31,6 @@ public class Move {
         private static final long FROM_TILE = 63l << FROM_TILE_SHIFT;
         private static final long EN_PASSANT = 1l << EN_PASSANT_SHIFT;
         private static final long PROMOTION_PIECE = 7l << PROMOTION_SHIFT;
-
-        public static final long KING_SIDE_CASTLE = 6l;
-        public static final long QUEEN_SIDE_CASTLE = 7l;
 
         public final long move;
 
@@ -53,9 +52,9 @@ public class Move {
                 builder.append(" ");
 
                 int piece = this.piece();
-                if(piece == KING_SIDE_CASTLE){
+                if(move == KING_SIDE_CASTLE(side()).get()){
                         return builder.append("castles King side").toString();
-                } else if(piece == QUEEN_SIDE_CASTLE){
+                } else if(move == QUEEN_SIDE_CASTLE(side()).get()){
                         return builder.append("castles Queen side").toString();
                 }
                 builder.append("moves ");
@@ -99,11 +98,41 @@ public class Move {
         }
 
         public static Move QUEEN_SIDE_CASTLE(int side){
-                return Move.of((QUEEN_SIDE_CASTLE << 1) | side);
+                Move.Builder builder = builder()
+                        .withPiece(KING);
+                if(side == WHITE){
+                        builder
+                                .withToTile(5)
+                                .withFromTile(3)
+                                .withSide(WHITE);
+                } else if(side == BLACK){
+                        builder
+                                .withToTile(61)
+                                .withFromTile(59)
+                                .withSide(BLACK);
+                }
+                return builder.build();
         }
 
         public static Move KING_SIDE_CASTLE(int side){
-                return Move.of((KING_SIDE_CASTLE << 1) | side);
+                Move.Builder builder = builder()
+                        .withPiece(KING);
+                if(side == WHITE){
+                        builder
+                                .withToTile(1)
+                                .withFromTile(3)
+                                .withSide(WHITE);
+                } else if(side == BLACK){
+                        builder
+                                .withToTile(57)
+                                .withFromTile(59)
+                                .withSide(BLACK);
+                }
+                return builder.build();
+        }
+
+        public long get(){
+                return move;
         }
 
         public static Move parseUCIString(Position position, String move){
@@ -113,6 +142,12 @@ public class Move {
                 int toTile = BitBoard.namedTileToIndex(to);
                 long[][] pieces = position.getPieces();
                 long out = 0l;
+                long[] all = new long[2];
+                for(int s = WHITE; s <= BLACK; s++){
+                        for(int p = PAWN; p <= KING; p++){
+                                all[s] |= position.getPieces()[s][p];
+                        }
+                }
 
                 //Check for Castles
                 if(to[RANK] == from[RANK] && to[RANK] == '8' && (pieces[BLACK][KING] & (1l << fromTile)) != 0 && Math.abs(to[FILE] - from[FILE]) > 1){ 
@@ -159,8 +194,9 @@ public class Move {
 
                 //Checking for En Passant
                 if(piece == PAWN 
-                        && ((1l << toTile) & pieces[1 - side][PAWN]) == 0 //Is capture tile empty
+                        && ((1l << toTile) & all[1 - side]) == 0 //Is capture tile empty
                         && from[FILE] != to[FILE]){      //Is pawn capture
+                        logger.log("EN PASSANT");
                         out |= 1l << EN_PASSANT_SHIFT;
                 }
                 

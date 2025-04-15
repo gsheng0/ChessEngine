@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import javax.swing.*;
+
+import org.george.chess.movegenerator.MoveGenerator;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -13,10 +16,20 @@ import java.awt.event.MouseListener;
 
 import static org.george.chess.util.Constants.*;
 
+//TODO: Figure out a better design for handling content
+//ContentHandler doesn't allow for handlers to extend on top of each other
+//IE: Adding click and drag to move pieces is too difficult to add
+//Maybe my own design of the content handler is too granular?
+//Figure out later
+//Condense input handling to one method
+//Figure out a better way to handle events
+//Register events to a listener for each content handler
 public class Window extends JPanel implements KeyListener, MouseListener {
     private JFrame frame;
     private Set<Integer> highlightedTiles;
     private List<ContentHandler> contentHandlers;
+    private int tile = -1;
+    private MoveGenerator moveGenerator;
 
     public Window() {
         this.frame = new JFrame();
@@ -27,6 +40,7 @@ public class Window extends JPanel implements KeyListener, MouseListener {
         frame.addMouseListener(this);
         frame.addKeyListener(this);
         contentHandlers = new ArrayList<>();
+        moveGenerator = new MoveGenerator();
     }
 
     public Window(ContentHandler... contentHandlers) {
@@ -96,13 +110,20 @@ public class Window extends JPanel implements KeyListener, MouseListener {
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
-        Point point = mouseEvent.getPoint();
-        int x = point.x - HORIZONTAL_SHIFT, y = point.y - VERTICAL_SHIFT;
-        int tileNumber = 63 - (x / SQUARE_SIZE + 8 * (y / SQUARE_SIZE));
-        if (highlightedTiles.contains(tileNumber)) {
-            highlightedTiles.remove(tileNumber);
-        } else {
-            highlightedTiles.add(tileNumber);
+        final Point point = mouseEvent.getPoint();
+        final int x = point.x - HORIZONTAL_SHIFT, y = point.y - VERTICAL_SHIFT;
+        final int tileNumber = 63 - (x / SQUARE_SIZE + 8 * (y / SQUARE_SIZE));
+        final int button = mouseEvent.getButton();
+        boolean refresh = false;
+        if(button == MouseEvent.BUTTON1){
+            if (highlightedTiles.contains(tileNumber)) {
+                highlightedTiles.remove(tileNumber);
+            } else {
+                highlightedTiles.add(tileNumber);
+            }
+        }
+        for(ContentHandler contentHandler : contentHandlers){
+            contentHandler.handleMousePressed(mouseEvent);
         }
         repaint();
     }

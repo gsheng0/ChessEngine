@@ -46,7 +46,19 @@ public class MoveGenerator {
                 break;
             }
         }
-
+        if(piece == PAWN){
+            logger.log("Piece on tile " + tile + " is a pawn");
+            return generatePawnMoves(position, tile, side, all);
+        } else if(piece == ROOK || piece == QUEEN || piece == BISHOP){
+            logger.log("Piece on tile " + tile + " is a sliding piece");
+            return generateSlidingPieceMoves(position, tile, piece, side, all);
+        } else if(piece == KNIGHT){
+            logger.log("Piece on tile " + tile + " is a knight");
+            return generateKnightMoves(position, tile, side, all);
+        } else if(piece == KING){
+            logger.log("Piece on tile " + tile + " is a king");
+            return generateKingMoves(position, tile, side, all);
+        }
         return Collections.emptyList();
     }
 
@@ -94,6 +106,14 @@ public class MoveGenerator {
                 moves.add(moveBuilder.withToTile(tile + shift).build());
             }
         }
+        //check for castles
+        long occupancyMask = all[WHITE] | all[BLACK];
+        if(position.canCastleKingSide(side) && (occupancyMask & KING_SIDE_CASTLE_SELECTORS[side]) == 0){
+            moves.add(Move.KING_SIDE_CASTLE(side));
+        }
+        if(position.canCastleQueenSide(side) && (occupancyMask & QUEEN_SIDE_CASTLE_SELECTORS[side]) == 0){
+            moves.add(Move.QUEEN_SIDE_CASTLE(side));
+        }
 
         return moves;
     }
@@ -116,7 +136,6 @@ public class MoveGenerator {
                 moves.add(moveBuilder.withToTile(tile + shift).build());
             }
         }
-
         return moves;
     }
 
@@ -124,7 +143,62 @@ public class MoveGenerator {
         final List<Move> moves = new ArrayList<>();
         final long[][] pieces = position.getPieces();
         final long tileMask = 1l << tile;
+        final Move.Builder moveBuilder = Move.builder()
+            .withSide(side)
+            .withPiece(PAWN)
+            .withFromTile(tile);
+        
+        long pruned = tileMask & PAWN_PRUNES[side];
+        if(pruned == 0){
+            return Collections.emptyList();
+        }
 
+        //Normal moves
+        int shift = PAWN_SHIFTS[side];
+        pruned = shift < 0 ? pruned >>> -shift : pruned << shift;
+        pruned &= ~(all[WHITE] | all[BLACK]);
+        if(pruned != 0){
+            moves.add(moveBuilder.withToTile(tile + shift).build());
+        }
+
+        //Double pawn push
+        if((tileMask & (FIRST_RANK << 8)) != 0 && moves.size() == 1){
+            pruned = shift < 0 ? pruned >>> -shift : pruned << shift;
+            pruned &= ~(all[WHITE] | all[BLACK]);
+            if(pruned != 0){
+                moves.add(moveBuilder.withToTile(tile + (2 * shift)).build());
+            }
+        }
+
+        //Captures
+        for(int i = 0; i < PAWN_ATTACKS[side].length; i++){
+            pruned = tileMask & PAWN_ATTACK_PRUNES[side][i];
+            if(pruned == 0){
+                continue;
+            }
+            shift = PAWN_ATTACKS[side][i];
+            int toTile = tile + PAWN_ATTACKS[side][i];
+            long toTileMask = 1l << toTile;
+            if((toTileMask & all[1 - side]) == 0){ //No enemy piece on target tile
+                continue;
+            }
+            moves.add(moveBuilder.withToTile(toTile).build());
+        }
+
+        //En Passant
+        int enPassantTile = position.getEnPassant();
+        //If the last move wasn't a 2 tile pawn push
+        if(enPassantTile == -1){
+            return moves;
+        }
+        //Pawn isn't on a rank that is a two tile push
+        if((tileMask & EN_PASSANT_RANK[side]) == 0){ 
+            return moves;
+        }
+
+        if(Math.abs(tile - enPassantTile) == 1){
+            moves.add(moveBuilder.withToTile(enPassantTile + (side == WHITE ? 8 : -8)).withEnPassant(1).build());
+        }
         return moves;
     }
 

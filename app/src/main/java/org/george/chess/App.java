@@ -31,13 +31,14 @@ public class App {
         private static final List<String> MY_LINE = List.of("e2e4", "e7e5", "g1f3", "g8f6", "b1c3", "f8c5", "f1c4", "f6g4", "e1g1", "d7d6", "h2h3", "h7h5", "d2d3", "c7c6", "c1g5", "f7f6", "g5h4");
         private static final List<String> LOLLI_GAMBIT = List.of("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "g8f6", "d2d4");
         private static final List<String> DOUBLE_BONG_CLOUD = List.of("e2e3", "e7e6", "e1e2", "e8e7");
+        private static final List<String> EN_PASSANT_TEST = List.of("e2e4", "d7d5", "e4e5", "f7f5");
 
         public static void main(String[] args) {
-                final List<String> moves = new ArrayList<>(DOUBLE_BONG_CLOUD);
+                final List<String> moves = new ArrayList<>(EN_PASSANT_TEST);
                 final UCIMoveContentHandler contentHandler = new UCIMoveContentHandler(moves);
                 final Window window = new Window(contentHandler);
                 final StockfishRunner stockfish = StockfishRunner.get();
-                stockfish.setThreads(9);
+                stockfish.setThreads(4);
                 while(true){
                         String move = stockfish.getBestMove(moves);
                         if(move.length() < 1){

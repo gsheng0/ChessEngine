@@ -37,12 +37,22 @@ public class Constants {
     public static final long H_FILE = 0x0101010101010101L;
     public static final long FIRST_RANK = ~((long) (Math.pow(2, 63)) << 8);
     public static final long EIGHTH_RANK = ~((long) (Math.pow(2, 63)) >>> 7);
+    public static final long[] EN_PASSANT_RANK = { EIGHTH_RANK >>> 23, FIRST_RANK << 24 };
+    public static final long[] KING_SIDE_CASTLE_SELECTORS = { 
+        6l,
+        6l << (8 * 7)
+    };
+    public static final long[] QUEEN_SIDE_CASTLE_SELECTORS = {
+        1l << 6 | 1l << 5 | 1l << 4,
+        1l << 62 | 1l << 61 | 1l << 60
+    };
 
     public static final long EDGES = A_FILE | H_FILE | FIRST_RANK | EIGHTH_RANK;
 
     // Move generation arrays
     // Pawns
     public static final int[] PAWN_SHIFTS = { 8, -8 };
+    public static final long[] PAWN_PRUNES = { ~EIGHTH_RANK, ~FIRST_RANK };
     public static final long[] STARTING_RANK = { FIRST_RANK << 8, EIGHTH_RANK >>> 8 };
     public static final int[][] PAWN_ATTACKS = {
         { 7, 9 },

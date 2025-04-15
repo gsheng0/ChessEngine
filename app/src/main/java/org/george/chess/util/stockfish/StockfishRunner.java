@@ -80,7 +80,7 @@ public class StockfishRunner {
         }
 
         writeCommand(builder.toString());
-        writeCommand("go movetime 5000");
+        writeCommand("go movetime 1000");
 
         return readResponse();
     }
