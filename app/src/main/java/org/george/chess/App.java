@@ -2,7 +2,7 @@ package org.george.chess;
 
 import static org.george.chess.util.Constants.*;
 
-import org.george.chess.movegenerator.MoveGenerator;
+import org.george.chess.service.MoveGenerator;
 import org.george.chess.util.Generator;
 import org.george.chess.util.Logger;
 import org.george.chess.util.BitBoard;

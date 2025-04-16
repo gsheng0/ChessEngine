@@ -5,7 +5,7 @@ import java.util.List;
 import org.george.chess.util.BitBoard;
 import org.george.chess.model.Move;
 import org.george.chess.model.Position;
-import org.george.chess.movegenerator.MoveGenerator;
+import org.george.chess.service.MoveGenerator;
 import org.george.chess.util.Logger;
 import static org.george.chess.util.Constants.*;
 

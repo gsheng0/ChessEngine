@@ -1,4 +1,4 @@
-package org.george.chess.movegenerator;
+package org.george.chess.service;
 
 import static org.george.chess.util.Constants.*;
 
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MoveGenerator {
-
     private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
 
     public List<Move> generateMoves(final Position position, final int side){
