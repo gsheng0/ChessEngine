@@ -47,16 +47,12 @@ public class MoveGenerator {
             }
         }
         if(piece == PAWN){
-            logger.log("Piece on tile " + tile + " is a pawn");
             return generatePawnMoves(position, tile, side, all);
         } else if(piece == ROOK || piece == QUEEN || piece == BISHOP){
-            logger.log("Piece on tile " + tile + " is a sliding piece");
             return generateSlidingPieceMoves(position, tile, piece, side, all);
         } else if(piece == KNIGHT){
-            logger.log("Piece on tile " + tile + " is a knight");
             return generateKnightMoves(position, tile, side, all);
         } else if(piece == KING){
-            logger.log("Piece on tile " + tile + " is a king");
             return generateKingMoves(position, tile, side, all);
         }
         return Collections.emptyList();
