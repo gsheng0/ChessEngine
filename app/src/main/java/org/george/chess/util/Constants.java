@@ -3,6 +3,8 @@ package org.george.chess.util;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.MouseEvent;
+
 import javax.imageio.ImageIO;
 import java.io.File;
 
@@ -138,15 +140,18 @@ public class Constants {
         KING_PRUNES
     };
 
-    public static final int RANK = 1;
     public static final int FILE = 0;
+    public static final int RANK = 1;
+
+    public static final int LEFT_MOUSE_BUTTON = MouseEvent.BUTTON1;
+    public static final int RIGHT_MOUSE_BUTTON = MouseEvent.BUTTON3;
 
     //Piece Images
     public static Image[][] PIECE_IMAGES = new Image[2][KING + 1];
 
     static {
-        //final String IMAGE_PATH_PREFIX = "C:\\Users\\George\\proj\\chess\\app\\src\\main\\resources\\";
-        final String IMAGE_PATH_PREFIX = "/Users/georgesheng/proj/ChessEngine/app/src/main/resources/";
+        final String IMAGE_PATH_PREFIX = "C:\\Users\\George\\proj\\chess\\app\\src\\main\\resources\\";
+        //final String IMAGE_PATH_PREFIX = "/Users/georgesheng/proj/ChessEngine/app/src/main/resources/";
         PIECE_IMAGES[WHITE][PAWN] = getImage(IMAGE_PATH_PREFIX + "white_pawn.png");
         PIECE_IMAGES[WHITE][KNIGHT] = getImage(IMAGE_PATH_PREFIX + "white_knight.png");
         PIECE_IMAGES[WHITE][BISHOP] = getImage(IMAGE_PATH_PREFIX + "white_bishop.png");

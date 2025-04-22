@@ -50,8 +50,10 @@ public class UCIMoveContentHandler implements ContentHandler<String>{
     public boolean handleKeyPressed(final KeyEvent e){
         if(e.getKeyChar() == 'l'){
             index = Math.min(positions.size() - 1, index + 1);
+            tile = -1;
         } else if(e.getKeyChar() == 'h'){
             index = Math.max(0, index - 1);
+            tile = -1;
         } else {
             return false;
         }
@@ -60,10 +62,17 @@ public class UCIMoveContentHandler implements ContentHandler<String>{
 
     @Override
     public boolean handleMousePressed(final MouseEvent e){
-        final Point point = e.getPoint();
-        final int x = point.x - HORIZONTAL_SHIFT, y = point.y - VERTICAL_SHIFT;
-        tile = 63 - (x / SQUARE_SIZE + 8 * (y / SQUARE_SIZE));
-        
+        if(e.getButton() == MouseEvent.BUTTON1){
+            final Point point = e.getPoint();
+            final int x = point.x - HORIZONTAL_SHIFT, y = point.y - VERTICAL_SHIFT;
+            final int prevTile = tile;
+            tile = 63 - (x / SQUARE_SIZE + 8 * (y / SQUARE_SIZE));
+            if(prevTile == tile){
+                tile = -1;
+            }
+        } else {
+            return false;
+        }
         return true;
     }
 

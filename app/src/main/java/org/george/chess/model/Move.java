@@ -1,15 +1,17 @@
 package org.george.chess.model;
 
 /**
-17 
-Promotion     
-|     10            3
-|     From tile     Piece
-000 0 000000 000000 000 0
-    |        To tile    Side
-    |        4          0
-    En Passant
-    16
+    17 
+    Promotion     
+    |     10            3
+    |     From tile     Piece
+000 000 0 000000 000000 000 0
+|       |        To tile    Side
+|       |        4          0
+|       En Passant
+|       16
+Captured Piece
+20
  */
 
 import static org.george.chess.util.Constants.*;
@@ -17,6 +19,8 @@ import static org.george.chess.util.Constants.*;
 import org.george.chess.util.BitBoard;
 import org.george.chess.util.Logger;
 
+//TODO: Find a better way to keep track of captured piece than incrementing it by 1
+//Storing captured piece is only necessary for enabling undoing moves
 public class Move {
         private static final Logger logger = Logger.of(Move.class);
         private static final long PIECE_SHIFT = 1l;
@@ -24,6 +28,7 @@ public class Move {
         private static final long FROM_TILE_SHIFT = 10l;
         private static final long EN_PASSANT_SHIFT = 16l;
         private static final long PROMOTION_SHIFT = 17l;
+        private static final long CAPTURE_SHIFT = 20l;
 
         private static final long SIDE = 1l;
         private static final long PIECE = 7l << PIECE_SHIFT;
@@ -31,6 +36,7 @@ public class Move {
         private static final long FROM_TILE = 63l << FROM_TILE_SHIFT;
         private static final long EN_PASSANT = 1l << EN_PASSANT_SHIFT;
         private static final long PROMOTION_PIECE = 7l << PROMOTION_SHIFT;
+        private static final long CAPTURED_PIECE = 7l << CAPTURE_SHIFT;
 
         public final long move;
 
@@ -83,6 +89,10 @@ public class Move {
 
         public long from(){
                 return (move & FROM_TILE) >> FROM_TILE_SHIFT;
+        }
+
+        public long captured(){
+                return (move & CAPTURED_PIECE) >> CAPTURE_SHIFT - 1;
         }
 
         public boolean isEnPassant(){
@@ -143,6 +153,8 @@ public class Move {
                 long[][] pieces = position.getPieces();
                 long out = 0l;
                 long[] all = new long[2];
+                long toTileMask = 1l << toTile;
+                long fromTileMask = 1l << toTile;
                 for(int s = WHITE; s <= BLACK; s++){
                         for(int p = PAWN; p <= KING; p++){
                                 all[s] |= position.getPieces()[s][p];
@@ -177,12 +189,11 @@ public class Move {
                 }
 
                 //Finding which piece is being moved
-                long tileMask = 1l << fromTile;
                 int piece = -1;
                 int side = -1;
                 for(int p = PAWN; p <= KING; p++){
                         for(int s = WHITE; s <= BLACK; s++){
-                                if((tileMask & pieces[s][p]) == 0){
+                                if((fromTileMask & pieces[s][p]) == 0){
                                         continue;
                                 }
                                 out |= s | (p << PIECE_SHIFT);
@@ -202,6 +213,15 @@ public class Move {
                 
                 out |= toTile << TO_TILE_SHIFT;
                 out |= fromTile << FROM_TILE_SHIFT;
+                
+                //Adding capture info
+                for(int p = PAWN; p <= KING; p++){
+                        if((position.getPieces()[1 - side][p] & toTileMask) == 0){
+                                continue;
+                        }
+                        out |= (p + 1) << CAPTURE_SHIFT;
+
+                }
 
                 return Move.of(out);
         }
@@ -261,6 +281,11 @@ public class Move {
                         this.side = side;
                         return this;
                 } 
+
+                public Builder withCapturedPiece(final int piece){
+                        this.piece = piece + 1;
+                        return this;
+                }
 
                 public Move build(){
                         long move = side | 

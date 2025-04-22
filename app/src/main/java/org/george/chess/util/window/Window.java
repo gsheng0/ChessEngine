@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.swing.*;
 
-import org.george.chess.movegenerator.MoveGenerator;
+import org.george.chess.service.MoveGenerator;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -115,7 +115,7 @@ public class Window extends JPanel implements KeyListener, MouseListener {
         final int tileNumber = 63 - (x / SQUARE_SIZE + 8 * (y / SQUARE_SIZE));
         final int button = mouseEvent.getButton();
         boolean refresh = false;
-        if(button == MouseEvent.BUTTON1){
+        if(button == RIGHT_MOUSE_BUTTON){
             if (highlightedTiles.contains(tileNumber)) {
                 highlightedTiles.remove(tileNumber);
             } else {

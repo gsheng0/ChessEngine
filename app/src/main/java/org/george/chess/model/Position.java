@@ -70,6 +70,11 @@ public class Position {
                         pieces[move.side()][ROOK] |= 1l << (4 + sideShift);
                         return;
                 }
+                
+                if(move.piece() == KING){
+                        castle[move.side()] = new boolean[] { false, false };
+                }
+
 
                 //normal move
                 long toTileMask = 1l << move.to();
@@ -97,6 +102,25 @@ public class Position {
                         pieces[move.side()][PAWN] &= ~toTileMask;
                         pieces[move.side()][move.promotionPiece()] |= toTileMask;
                 }
+        }
+
+        //TODO: Figure out a good way to keep track of castling availability
+        public void unapply(Move move){
+                int sideShift = move.side() == WHITE ? 0 : 56;
+
+                //castles
+                if(move.get() == Move.KING_SIDE_CASTLE(move.side()).get()){
+                        pieces[move.side()][KING] = 1l << (3 + sideShift);
+                        pieces[move.side()][ROOK] |= 1l << sideShift;
+                        pieces[move.side()][ROOK] &= ~(1l << (2 + sideShift));
+                        return;
+                } else if(move.get() == Move.QUEEN_SIDE_CASTLE(move.side()).get()){
+                        pieces[move.side()][KING] = 1l << (3 + sideShift);
+                        pieces[move.side()][ROOK] |= 1l << (7 + sideShift);
+                        pieces[move.side()][ROOK] &= ~(1l << (4 + sideShift));
+                        return;
+                }
+
 
         }
 

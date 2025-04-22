@@ -59,11 +59,12 @@ public class MoveGenerator {
 
     public List<Move> generateSlidingPieceMoves(final Position position, final int tile, final int piece, final int side, final long[] all){
         final List<Move> moves = new ArrayList<>();
-        final long[][] pieces = position.getPieces();
         final long tileMask = 1l << tile;
-        final Move.Builder moveBuilder = Move.builder().withSide(side)
+        final Move.Builder moveBuilder = Move.builder()
+            .withSide(side)
             .withPiece(piece)
             .withFromTile(tile);
+
         for(int i = 0; i < SHIFTS[piece].length; i++){
             int shift = SHIFTS[piece][i];
             int currentTile = tile;
