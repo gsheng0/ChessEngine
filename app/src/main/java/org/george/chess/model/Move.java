@@ -40,7 +40,7 @@ public class Move {
 
         public final long move;
 
-        private Move(long move){
+        private Move(final long move){
                 this.move = move;
         }
 
@@ -91,8 +91,8 @@ public class Move {
                 return (move & FROM_TILE) >> FROM_TILE_SHIFT;
         }
 
-        public long captured(){
-                return (move & CAPTURED_PIECE) >> CAPTURE_SHIFT - 1;
+        public int captured(){
+                return (int)((move & CAPTURED_PIECE) >> CAPTURE_SHIFT - 1);
         }
 
         public boolean isEnPassant(){
@@ -145,13 +145,12 @@ public class Move {
                 return move;
         }
 
-        public static Move parseUCIString(Position position, String move){
-                char[] from = move.substring(0, 2).toCharArray();
-                char[] to = move.substring(2).toCharArray();
-                int fromTile = BitBoard.namedTileToIndex(from);
-                int toTile = BitBoard.namedTileToIndex(to);
-                long[][] pieces = position.getPieces();
-                long out = 0l;
+        public static Move parseUCIString(final Position position, final String move){
+                final char[] from = move.substring(0, 2).toCharArray();
+                final char[] to = move.substring(2).toCharArray();
+                final int fromTile = BitBoard.namedTileToIndex(from);
+                final int toTile = BitBoard.namedTileToIndex(to);
+                final long[][] pieces = position.getPieces();
                 long[] all = new long[2];
                 long toTileMask = 1l << toTile;
                 long fromTileMask = 1l << toTile;
@@ -175,17 +174,18 @@ public class Move {
                                 return Move.QUEEN_SIDE_CASTLE(WHITE);
                         }
                 }
+                final Move.Builder moveBuilder = Move.builder();
 
                 //Checking for pawn promotion
                 char promotion = to.length > 2 ? to[2] : '-';
                 if(promotion == 'q'){
-                        out |= QUEEN << PROMOTION_SHIFT;
+                        moveBuilder.withPromotionPiece(QUEEN);
                 } else if(promotion == 'r'){
-                        out |= ROOK << PROMOTION_SHIFT;
+                        moveBuilder.withPromotionPiece(ROOK);
                 } else if(promotion == 'b'){
-                        out |= BISHOP << PROMOTION_SHIFT;
+                        moveBuilder.withPromotionPiece(BISHOP);
                 } else if(promotion == 'n'){
-                        out |= KNIGHT << PROMOTION_SHIFT;
+                        moveBuilder.withPromotionPiece(KNIGHT);
                 }
 
                 //Finding which piece is being moved
@@ -196,7 +196,7 @@ public class Move {
                                 if((fromTileMask & pieces[s][p]) == 0){
                                         continue;
                                 }
-                                out |= s | (p << PIECE_SHIFT);
+                                moveBuilder.withPiece(p);
                                 piece = p;
                                 side = s;
                                 break;
@@ -207,23 +207,21 @@ public class Move {
                 if(piece == PAWN 
                         && ((1l << toTile) & all[1 - side]) == 0 //Is capture tile empty
                         && from[FILE] != to[FILE]){      //Is pawn capture
-                        logger.log("EN PASSANT");
-                        out |= 1l << EN_PASSANT_SHIFT;
+                        moveBuilder.isEnPassant(true);
                 }
                 
-                out |= toTile << TO_TILE_SHIFT;
-                out |= fromTile << FROM_TILE_SHIFT;
+                moveBuilder.withToTile(toTile);
+                moveBuilder.withToTile(fromTile);
                 
                 //Adding capture info
                 for(int p = PAWN; p <= KING; p++){
                         if((position.getPieces()[1 - side][p] & toTileMask) == 0){
                                 continue;
                         }
-                        out |= (p + 1) << CAPTURE_SHIFT;
-
+                        moveBuilder.withCapturedPiece(piece);
                 }
 
-                return Move.of(out);
+                return moveBuilder.build();
         }
 
         public static class Builder {
@@ -272,8 +270,18 @@ public class Move {
                         return this;
                 }
 
+                @Deprecated
                 public Builder withEnPassant(final int enPassant){
                         this.enPassant = enPassant;
+                        return this;
+                }
+
+                public Builder isEnPassant(final boolean enPassant){
+                        if(enPassant){
+                                this.enPassant = 1;
+                        } else{
+                                this.enPassant = 0;
+                        }
                         return this;
                 }
                 

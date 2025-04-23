@@ -31,10 +31,14 @@ public class Perft {
 
     private void search(final int depth, final int side){
         if(depth == 0){
+            count++;
             return;
         }
         List<Move> moves = moveGenerator.generateMoves(position, side);
         for(final Move move : moves){
+            position.apply(move);
+            search(depth - 1, 1 - side);
+            position.unapply(move);
         }
 
     }

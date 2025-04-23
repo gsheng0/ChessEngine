@@ -6,7 +6,7 @@ import java.util.Arrays;
 import org.george.chess.util.BitBoard;
 import org.george.chess.util.Logger;
 
-//TODO: Find faster way to undo a move
+//TODO: Fix loss of information issue when undoing moves
 public class Position {
         private static final Logger logger = Logger.of(Position.class);
         private long[][] pieces;
@@ -57,71 +57,107 @@ public class Position {
 
         //move this into an interace implementation to enable other variants of chess
         public void apply(Move move){ 
-                int sideShift = move.side() == WHITE ? 0 : 56;
+                final int sideShift = move.side() == WHITE ? 0 : 56;
+                final int side = move.side();
+                final int piece = move.piece();
+                final long to = move.to();
+                final long from = move.from();
+                final long fromTileMask = 1l << from;
+
                 //castles
-                if(move.get() == Move.KING_SIDE_CASTLE(move.side()).get()){
-                        pieces[move.side()][KING] = 1l << (1 + sideShift);
-                        pieces[move.side()][ROOK] &=  ~(1l << sideShift);
-                        pieces[move.side()][ROOK] |= 1l << (2 + sideShift);
+                if(move.get() == Move.KING_SIDE_CASTLE(side).get()){
+                        castle[side] = new boolean[] { false, false };
+                        pieces[side][KING] = 1l << (1 + sideShift);
+                        pieces[side][ROOK] &=  ~(1l << sideShift);
+                        pieces[side][ROOK] |= 1l << (2 + sideShift);
                         return;
-                } else if(move.get() == Move.QUEEN_SIDE_CASTLE(move.side()).get()){
-                        pieces[move.side()][KING] = 1l << (5 + sideShift);
-                        pieces[move.side()][ROOK] &= ~(1l << (7 + sideShift));
-                        pieces[move.side()][ROOK] |= 1l << (4 + sideShift);
+                } else if(move.get() == Move.QUEEN_SIDE_CASTLE(side).get()){
+                        castle[side] = new boolean[] { false, false };
+                        pieces[side][KING] = 1l << (5 + sideShift);
+                        pieces[side][ROOK] &= ~(1l << (7 + sideShift));
+                        pieces[side][ROOK] |= 1l << (4 + sideShift);
                         return;
                 }
                 
-                if(move.piece() == KING){
-                        castle[move.side()] = new boolean[] { false, false };
+                if(piece == KING){
+                        castle[side] = new boolean[] { false, false };
                 }
 
-
                 //normal move
-                long toTileMask = 1l << move.to();
-                pieces[move.side()][move.piece()] &= ~(1l << move.from());
-                pieces[move.side()][move.piece()] |= toTileMask;
+                long toTileMask = 1l << to;
+                pieces[side][piece] &= ~(1l << from);
+                pieces[side][piece] |= toTileMask;
 
                 //removing captured piece
-                for(int piece = PAWN; piece <= KING; piece++){
-                        pieces[1 - move.side()][piece] &= ~toTileMask;
+                for(int p = PAWN; p<= KING; p++){
+                        pieces[1 - side][p] &= ~toTileMask;
                 }
 
                 //removing en passant'd pawn
                 if(move.isEnPassant()){
-                        pieces[1 - move.side()][PAWN] &= ~(1l << (move.to() + (move.side() == WHITE ? -8 : 8)));
+                        pieces[1 - side][PAWN] &= ~(1l << (to + (side == WHITE ? -8 : 8)));
                 }
 
                 //setting possible en passant'able pawn square
                 enPassant = -1;
-                if(move.piece() == PAWN && 16 == Math.abs(move.to() - move.from())){
-                        enPassant = (int)move.to();
+                if(piece == PAWN && 16 == Math.abs(to - from)){
+                        enPassant = (int)to;
                 }
                 
                 //pawn promotion
                 if(move.promotionPiece() > PAWN){
-                        pieces[move.side()][PAWN] &= ~toTileMask;
-                        pieces[move.side()][move.promotionPiece()] |= toTileMask;
+                        pieces[side][PAWN] &= ~fromTileMask;
+                        pieces[side][move.promotionPiece()] |= toTileMask;
                 }
         }
 
         //TODO: Figure out a good way to keep track of castling availability
         public void unapply(Move move){
-                int sideShift = move.side() == WHITE ? 0 : 56;
+                final int side = move.side();
+                final long to = move.to();
+                final long from = move.from();
+                final int piece = move.piece();
+                final int sideShift = getSideShift(side);
+                final long fromTileMask = 1l << from;
+                final long toTileMask = 1l << to;
 
                 //castles
-                if(move.get() == Move.KING_SIDE_CASTLE(move.side()).get()){
-                        pieces[move.side()][KING] = 1l << (3 + sideShift);
-                        pieces[move.side()][ROOK] |= 1l << sideShift;
-                        pieces[move.side()][ROOK] &= ~(1l << (2 + sideShift));
+                if(move.get() == Move.KING_SIDE_CASTLE(side).get()){
+                        pieces[side][KING] = 1l << (3 + sideShift);
+                        pieces[side][ROOK] |= 1l << sideShift;
+                        pieces[side][ROOK] &= ~(1l << (2 + sideShift));
                         return;
-                } else if(move.get() == Move.QUEEN_SIDE_CASTLE(move.side()).get()){
-                        pieces[move.side()][KING] = 1l << (3 + sideShift);
-                        pieces[move.side()][ROOK] |= 1l << (7 + sideShift);
-                        pieces[move.side()][ROOK] &= ~(1l << (4 + sideShift));
+                } else if(move.get() == Move.QUEEN_SIDE_CASTLE(side).get()){
+                        pieces[side][KING] = 1l << (3 + sideShift);
+                        pieces[side][ROOK] |= 1l << (7 + sideShift);
+                        pieces[side][ROOK] &= ~(1l << (4 + sideShift));
                         return;
                 }
 
+                //Restoring captured piece
+                if(move.captured() > 0l){
+                        pieces[1 - side][move.captured() - 1] |= fromTileMask;
+                }
 
+                //moving piece back
+                pieces[side][piece] &= ~(toTileMask);
+                pieces[side][piece] |= toTileMask;
+
+                //putting enpassant'd pawn back
+                if(move.isEnPassant()){
+                        pieces[1 - side][PAWN] |= 1l << (to + (side == WHITE ? -8 : 8));
+                }
+
+                //undoing pawn promotion
+                if(move.promotionPiece() > PAWN){
+                        pieces[side][PAWN] |= fromTileMask;
+                        pieces[side][move.promotionPiece()] &= ~toTileMask;
+                }
+
+        }
+
+        private int getSideShift(int side){
+                return side == WHITE ? 0 : 56;
         }
 
         public long[][] getPieces(){

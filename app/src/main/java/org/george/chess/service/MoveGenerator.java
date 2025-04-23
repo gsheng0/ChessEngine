@@ -11,6 +11,7 @@ import java.util.Collections;
 
 public class MoveGenerator {
     private static final Logger<MoveGenerator> logger = Logger.of(MoveGenerator.class);
+    private AttackMaskServiceImpl attackMaskService = new AttackMaskServiceImpl();
 
     public List<Move> generateMoves(final Position position, final int side){
         final List<Move> moves = new ArrayList<>();
@@ -93,11 +94,17 @@ public class MoveGenerator {
             .withPiece(KING)
             .withFromTile(tile);
 
+        final long attackMask = attackMaskService.generateAttackMask(position, 1 - side);
+        //currently in check
+        if((attackMask & tileMask) != 0){
+
+        }
+
         for(int i = 0; i < SHIFTS[KING].length; i++){
             int shift = SHIFTS[KING][i];
             long pruned = tileMask & PRUNES[KING][i];
             pruned = shift < 0 ? pruned >>> -shift : pruned << shift;
-            pruned &= ~all[side];
+            pruned &= (~all[side] & ~attackMask); //TODO: Make sure this logic makes sense
             if(pruned != 0){
                 moves.add(moveBuilder.withToTile(tile + shift).build());
             }
@@ -273,23 +280,4 @@ public class MoveGenerator {
         return moves;
     }
 
-    long generateKnightMoves(final long[][] pieces, final long[] all, final int side) {
-        return generateNonSlidingPieceMoves(pieces, all, side, KNIGHT);
-    }
-
-    long generateBishopMoves(final long[][] pieces, final long[] all, final int side) {
-        return generateSlidingPieceMoves(pieces, all, side, BISHOP);
-    }
-
-    long generateRookMoves(final long[][] pieces, final long[] all, final int side) {
-        return generateSlidingPieceMoves(pieces, all, side, ROOK);
-    }
-
-    long generateQueenMoves(final long[][] pieces, final long[] all, final int side) {
-        return generateSlidingPieceMoves(pieces, all, side, QUEEN);
-    }
-
-    long generateKingMoves(final long[][] pieces, final long[] all, final int side) {
-        return generateNonSlidingPieceMoves(pieces, all, side, KING);
-    }
 }
