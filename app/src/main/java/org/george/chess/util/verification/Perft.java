@@ -5,28 +5,29 @@ import java.util.List;
 import org.george.chess.model.Move;
 import org.george.chess.model.Position;
 import org.george.chess.service.MoveGenerator;
+import org.george.chess.util.Logger;
+
+import static org.george.chess.util.Constants.*;
 
 public class Perft {
     private final Position position;
     private int count = 0;
-    private final int depth;
     private final MoveGenerator moveGenerator;
-    public Perft(final int depth, final Position position){
+    private static final Logger logger = Logger.of(Perft.class);
+
+    public Perft(final Position position){
         this.position = position;
-        this.depth = depth;
         this.moveGenerator = new MoveGenerator();
     }
 
-    public Perft(final int depth){
-        this(depth, Position.START_POSITION);
+    public Perft(){
+        this(Position.START_POSITION);
     }
 
-    public void run(){
-        if(count != 0){
-            return;
-        }
-        
-
+    public int run(final int depth){
+        count = 0;
+        search(depth, WHITE);
+        return count;
     }
 
     private void search(final int depth, final int side){
@@ -36,17 +37,11 @@ public class Perft {
         }
         List<Move> moves = moveGenerator.generateMoves(position, side);
         for(final Move move : moves){
+                logger.log(move.toString());
             position.apply(move);
             search(depth - 1, 1 - side);
             position.unapply(move);
         }
 
     }
-
-    public int getCount(){
-        return count;
-    }
-
-    
-
 }

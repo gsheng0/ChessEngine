@@ -141,7 +141,7 @@ public class Position {
 
                 //moving piece back
                 pieces[side][piece] &= ~(toTileMask);
-                pieces[side][piece] |= toTileMask;
+                pieces[side][piece] |= fromTileMask;
 
                 //putting enpassant'd pawn back
                 if(move.isEnPassant()){

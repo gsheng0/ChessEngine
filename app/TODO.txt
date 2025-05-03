@@ -1,0 +1,6 @@
+1. Separate move generation methods into different classes
+2. Add "all" field to Position class
+3. Fix MoveGeneratorService
+4. Add move generation while in check
+5. Setup perft testing
+6. 

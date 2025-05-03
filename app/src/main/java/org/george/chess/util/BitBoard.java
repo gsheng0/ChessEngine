@@ -26,6 +26,7 @@ public class BitBoard {
         builder.withAdditionally(BLACK, KING, 1l << 59);
         builder.withAdditionally(BLACK, QUEEN, 1l << 60);
         builder.withAdditionally(BLACK, KNIGHT, 1l << 57);
+        
         builder.withAdditionally(BLACK, KNIGHT, 1l << 62);
         builder.withAdditionally(BLACK, BISHOP, 1l << 61);
         builder.withAdditionally(BLACK, BISHOP, 1l << 58);

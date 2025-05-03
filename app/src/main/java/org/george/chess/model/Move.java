@@ -152,8 +152,8 @@ public class Move {
                 final int toTile = BitBoard.namedTileToIndex(to);
                 final long[][] pieces = position.getPieces();
                 long[] all = new long[2];
-                long toTileMask = 1l << toTile;
-                long fromTileMask = 1l << toTile;
+                final long toTileMask = 1l << toTile;
+                final long fromTileMask = 1l << fromTile;
                 for(int s = WHITE; s <= BLACK; s++){
                         for(int p = PAWN; p <= KING; p++){
                                 all[s] |= position.getPieces()[s][p];
@@ -201,6 +201,10 @@ public class Move {
                                 side = s;
                                 break;
                         }
+                }
+
+                if(side == -1 || piece == -1){
+                        throw new RuntimeException("Error: No piece found at start tile " + new String(from));
                 }
 
                 //Checking for En Passant

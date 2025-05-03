@@ -7,6 +7,7 @@ import org.george.chess.util.Generator;
 import org.george.chess.util.Logger;
 import org.george.chess.util.BitBoard;
 import org.george.chess.util.stockfish.StockfishRunner;
+import org.george.chess.util.verification.Perft;
 import org.george.chess.util.window.BitMaskContentHandler;
 import org.george.chess.util.window.ContentHandler;
 import org.george.chess.util.window.UCIMoveContentHandler;
@@ -34,21 +35,26 @@ public class App {
         private static final List<String> EN_PASSANT_TEST = List.of("e2e4", "d7d5", "e4e5", "f7f5");
 
         public static void main(String[] args) {
-                final List<String> moves = new ArrayList<>(EN_PASSANT_TEST);
-                final UCIMoveContentHandler contentHandler = new UCIMoveContentHandler(moves);
-                final Window window = new Window(contentHandler);
-                final StockfishRunner stockfish = StockfishRunner.get();
-                stockfish.setThreads(4);
-                while(true){
-                        String move = stockfish.getBestMove(moves);
-                        if(move.length() < 1){
-                                break;
-                        }
-                        moves.add(move);
-                        window.acceptContent(move, UCIMoveContentHandler.class);
-                }
-                System.out.println("Game done: ");
-                System.out.println(moves);
+                // final List<String> moves = new ArrayList<>(EN_PASSANT_TEST);
+                // final UCIMoveContentHandler contentHandler = new UCIMoveContentHandler(moves);
+                // final Window window = new Window(contentHandler);
+                // final StockfishRunner stockfish = StockfishRunner.get();
+                // stockfish.setThreads(4);
+                // while(true){
+                //         String move = stockfish.getBestMove(moves);
+                //         if(move.length() < 1){
+                //                 break;
+                //         }
+                //         moves.add(move);
+                //         window.acceptContent(move, UCIMoveContentHandler.class);
+                // }
+                // System.out.println("Game done: ");
+                // System.out.println(moves);
+                final Position position = Position.START_POSITION.copy();
+                //position.apply(Move.parseUCIString(position, "e2e4"));
+                final Perft perft = new Perft(position);
+
+                logger.log("" + perft.run(3));
                 
         }
 }

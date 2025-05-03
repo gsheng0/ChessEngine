@@ -39,7 +39,8 @@ public class Constants {
     public static final long H_FILE = 0x0101010101010101L;
     public static final long FIRST_RANK = ~((long) (Math.pow(2, 63)) << 8);
     public static final long EIGHTH_RANK = ~((long) (Math.pow(2, 63)) >>> 7);
-    public static final long[] EN_PASSANT_RANK = { EIGHTH_RANK >>> 23, FIRST_RANK << 24 };
+    public static final long[] PAWN_START_RANKS = { FIRST_RANK << 8, EIGHTH_RANK >>> 8};
+    public static final long[] EN_PASSANT_RANK = { EIGHTH_RANK >>> 24, FIRST_RANK << 24 };
     public static final long[] KING_SIDE_CASTLE_SELECTORS = { 
         6l,
         6l << (8 * 7)
@@ -52,7 +53,7 @@ public class Constants {
     public static final long EDGES = A_FILE | H_FILE | FIRST_RANK | EIGHTH_RANK;
 
     // Move generation arrays
-    // Pawns
+    // Pawn
     public static final int[] PAWN_SHIFTS = { 8, -8 };
     public static final long[] PAWN_PRUNES = { ~EIGHTH_RANK, ~FIRST_RANK };
     public static final long[] STARTING_RANK = { FIRST_RANK << 8, EIGHTH_RANK >>> 8 };
@@ -150,8 +151,8 @@ public class Constants {
     public static Image[][] PIECE_IMAGES = new Image[2][KING + 1];
 
     static {
-        final String IMAGE_PATH_PREFIX = "C:\\Users\\George\\proj\\chess\\app\\src\\main\\resources\\";
-        //final String IMAGE_PATH_PREFIX = "/Users/georgesheng/proj/ChessEngine/app/src/main/resources/";
+        // final String IMAGE_PATH_PREFIX = "C:\\Users\\George\\proj\\chess\\app\\src\\main\\resources\\";
+        final String IMAGE_PATH_PREFIX = "/Users/georgesheng/proj/ChessEngine/app/src/main/resources/";
         PIECE_IMAGES[WHITE][PAWN] = getImage(IMAGE_PATH_PREFIX + "white_pawn.png");
         PIECE_IMAGES[WHITE][KNIGHT] = getImage(IMAGE_PATH_PREFIX + "white_knight.png");
         PIECE_IMAGES[WHITE][BISHOP] = getImage(IMAGE_PATH_PREFIX + "white_bishop.png");

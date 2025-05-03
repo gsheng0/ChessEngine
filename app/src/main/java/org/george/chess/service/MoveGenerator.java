@@ -104,7 +104,7 @@ public class MoveGenerator {
             int shift = SHIFTS[KING][i];
             long pruned = tileMask & PRUNES[KING][i];
             pruned = shift < 0 ? pruned >>> -shift : pruned << shift;
-            pruned &= (~all[side] & ~attackMask); //TODO: Make sure this logic makes sense
+            pruned &= ~(all[side] | attackMask);
             if(pruned != 0){
                 moves.add(moveBuilder.withToTile(tile + shift).build());
             }
@@ -142,6 +142,7 @@ public class MoveGenerator {
         return moves;
     }
 
+    //TODO: Add move generation for pawn promotions
     public List<Move> generatePawnMoves(final Position position, final int tile, final int side, final long[] all){
         final List<Move> moves = new ArrayList<>();
         final long[][] pieces = position.getPieces();
@@ -165,7 +166,7 @@ public class MoveGenerator {
         }
 
         //Double pawn push
-        if((tileMask & (FIRST_RANK << 8)) != 0 && moves.size() == 1){
+        if((tileMask & (PAWN_START_RANKS[side])) != 0 && moves.size() == 1){
             pruned = shift < 0 ? pruned >>> -shift : pruned << shift;
             pruned &= ~(all[WHITE] | all[BLACK]);
             if(pruned != 0){
@@ -194,13 +195,9 @@ public class MoveGenerator {
         if(enPassantTile == -1){
             return moves;
         }
-        //Pawn isn't on a rank that is a two tile push
-        if((tileMask & EN_PASSANT_RANK[side]) == 0){ 
-            return moves;
-        }
 
         if(Math.abs(tile - enPassantTile) == 1){
-            moves.add(moveBuilder.withToTile(enPassantTile + (side == WHITE ? 8 : -8)).withEnPassant(1).build());
+            moves.add(moveBuilder.withToTile(enPassantTile + (side == WHITE ? 8 : -8)).isEnPassant(true).build());
         }
         return moves;
     }
@@ -280,4 +277,23 @@ public class MoveGenerator {
         return moves;
     }
 
+    long generateKnightMoves(final long[][] pieces, final long[] all, final int side) {
+        return generateNonSlidingPieceMoves(pieces, all, side, KNIGHT);
+    }
+
+    long generateBishopMoves(final long[][] pieces, final long[] all, final int side) {
+        return generateSlidingPieceMoves(pieces, all, side, BISHOP);
+    }
+
+    long generateRookMoves(final long[][] pieces, final long[] all, final int side) {
+        return generateSlidingPieceMoves(pieces, all, side, ROOK);
+    }
+
+    long generateQueenMoves(final long[][] pieces, final long[] all, final int side) {
+        return generateSlidingPieceMoves(pieces, all, side, QUEEN);
+    }
+
+    long generateKingMoves(final long[][] pieces, final long[] all, final int side) {
+        return generateNonSlidingPieceMoves(pieces, all, side, KING);
+    }
 }
